@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const Typewriter = ({ text, typingSpeed = 100, blinkSpeed = 500 }) => {
+const Typewriter = ({ text, typingSpeed = 60 }) => {
   const [displayedText, setDisplayedText] = useState('');
-  const [showCursor, setShowCursor] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const cursorRef = useRef(null);
 
   useEffect(() => {
     if (currentIndex < text.length) {
@@ -14,19 +14,18 @@ const Typewriter = ({ text, typingSpeed = 100, blinkSpeed = 500 }) => {
       }, typingSpeed);
       return () => clearTimeout(typingTimer);
     } else {
-      // Once typing is complete, start cursor blinking
-      const cursorTimer = setInterval(() => {
-        setShowCursor(prev => !prev);
-      }, blinkSpeed);
-      return () => clearInterval(cursorTimer);
+      // Typing is complete, activate blinking
+      if (cursorRef.current) {
+        cursorRef.current.classList.add('blink-active');
+      }
     }
-  }, [currentIndex, text, typingSpeed, blinkSpeed]);
+  }, [currentIndex, text, typingSpeed]);
 
   return (
-    <span className="typewriter-text font-console">
+    <span className="typewriter-text font-press-start">
       {displayedText}
-      <span className={`cursor ${showCursor ? 'visible' : 'hidden'}`}>
-        |
+      <span ref={cursorRef} className="cursor">
+        █
       </span>
     </span>
   );

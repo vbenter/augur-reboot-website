@@ -5,7 +5,9 @@ import Typewriter from '../components/Typewriter.jsx';
 
 <Layout title="Welcome to Astro.">
 	<main>
-		<Typewriter client:load text="Hello, Astro and React!" typingSpeed={100} blinkSpeed={500} />
+		<div class="flex flex-col items-center justify-center h-screen">
+			<Typewriter client:load text="Hello, Astro and React!" />
+		</div>
 	</main>
 </Layout>
 

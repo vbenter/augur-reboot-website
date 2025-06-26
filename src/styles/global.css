@@ -1,15 +1,21 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
 .cursor {
   display: inline-block;
   width: 0.5em;
   margin-left: 2px;
+  vertical-align: text-bottom;
+}
+
+.cursor.blink-active {
   animation: blink-animation 1s steps(2, start) infinite;
 }
 
 .cursor.hidden {
   visibility: hidden;
+}
+
+.font-press-start {
+  font-family: "Press Start 2P", cursive;
 }
 
 @keyframes blink-animation {
