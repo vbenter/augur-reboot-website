@@ -18,7 +18,7 @@ To start the local development server, run the following command:
 npm run dev
 ```
 
-This will start a hot-reloading development server, typically at `http://localhost:4321`.
+This will start a hot-reloading development server, typically at `http://localhost:4321`. If running this command via a non-interactive shell (e.g., a script or an agent), it's recommended to run it in the background using `npm run dev &` to prevent the process from blocking the shell.
 
 ## Building
 

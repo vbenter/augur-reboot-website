@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Typewriter from './Typewriter.jsx';
 
-const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSentences = 1000, holdDuration = 1500 }) => {
+const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSentences = 1000, holdDuration = 1500, onSequenceComplete }) => {
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [showTypewriter, setShowTypewriter] = useState(true);
 
@@ -27,6 +27,14 @@ const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSe
       }, delayBetweenSentences);
     }, holdDuration);
   };
+
+  useEffect(() => {
+    if (currentSentenceIndex >= sentences.length) {
+      if (onSequenceComplete) {
+        onSequenceComplete();
+      }
+    }
+  }, [currentSentenceIndex, sentences.length, onSequenceComplete]);
 
   if (currentSentenceIndex >= sentences.length) {
     return null; // All sentences typed

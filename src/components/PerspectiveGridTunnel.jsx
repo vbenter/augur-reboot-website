@@ -1,0 +1,166 @@
+import React, { useRef, useEffect, useState } from 'react';
+
+const PerspectiveGridTunnel = ({
+  numLines = 20,
+  lineColor = '#00ff00',
+  animationSpeed = 1,
+  animationStarted = false,
+  maxOpacity = 1
+}) => {
+  const canvasRef = useRef(null);
+  const animationFrameId = useRef(null);
+  const frameCount = useRef(0);
+  const [opacity, setOpacity] = useState(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let width, height;
+
+    const resizeCanvas = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height);
+      
+      // --- Style Setup ---
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = lineColor;
+
+      // --- Horizon Definition ---
+      const horizonWidth = width * 0.1;
+      const horizonHeight = height * 0.15;
+      const horizonX = (width - horizonWidth) / 2;
+      const horizonY = (height - horizonHeight) / 2;
+
+      // --- 1. Draw STATIC Converging Lines with Gradient Opacity ---
+      const drawConvergingLines = () => {
+        for (let i = 0; i <= numLines; i++) {
+          const ratio = i / numLines;
+
+          // --- Gradient for Top lines ---
+          const x1_top = ratio * width;
+          const y1_top = 0;
+          const x2_top = horizonX + ratio * horizonWidth;
+          const y2_top = horizonY;
+          
+          let gradient = ctx.createLinearGradient(x1_top, y1_top, x2_top, y2_top);
+          gradient.addColorStop(0, `${lineColor}ff`); // Opaque at the edge
+          gradient.addColorStop(1, `${lineColor}00`); // Transparent at the horizon
+          ctx.strokeStyle = gradient;
+          ctx.beginPath(); ctx.moveTo(x1_top, y1_top); ctx.lineTo(x2_top, y2_top); ctx.stroke();
+
+          // --- Gradient for Bottom lines ---
+          const y1_bot = height;
+          const y2_bot = horizonY + horizonHeight;
+          gradient = ctx.createLinearGradient(x1_top, y1_bot, x2_top, y2_bot);
+          gradient.addColorStop(0, `${lineColor}ff`);
+          gradient.addColorStop(1, `${lineColor}00`);
+          ctx.strokeStyle = gradient;
+          ctx.beginPath(); ctx.moveTo(x1_top, y1_bot); ctx.lineTo(x2_top, y2_bot); ctx.stroke();
+
+          // --- Gradient for Left lines ---
+          const x1_left = 0;
+          const y1_left = ratio * height;
+          const x2_left = horizonX;
+          const y2_left = horizonY + ratio * horizonHeight;
+          gradient = ctx.createLinearGradient(x1_left, y1_left, x2_left, y2_left);
+          gradient.addColorStop(0, `${lineColor}ff`);
+          gradient.addColorStop(1, `${lineColor}00`);
+          ctx.strokeStyle = gradient;
+          ctx.beginPath(); ctx.moveTo(x1_left, y1_left); ctx.lineTo(x2_left, y2_left); ctx.stroke();
+          
+          // --- Gradient for Right lines ---
+          const x1_right = width;
+          const x2_right = horizonX + horizonWidth;
+          gradient = ctx.createLinearGradient(x1_right, y1_left, x2_right, y2_left);
+          gradient.addColorStop(0, `${lineColor}ff`);
+          gradient.addColorStop(1, `${lineColor}00`);
+          ctx.strokeStyle = gradient;
+          ctx.beginPath(); ctx.moveTo(x1_right, y1_left); ctx.lineTo(x2_right, y2_left); ctx.stroke();
+        }
+      };
+
+      // --- 2. Draw ANIMATED Grid Squares (Center to Edge) ---
+      const drawAnimatedGrid = () => {
+        const zOffset = frameCount.current * animationSpeed;
+        const segmentLength = 40;
+        const totalSegments = 20;
+
+        for (let i = 0; i < totalSegments; i++) {
+          const z = (i * segmentLength) + (zOffset % segmentLength);
+          const linearScale = z / (totalSegments * segmentLength);
+
+          if (linearScale > 1 || linearScale < 0) continue;
+
+          // Use an exponential scale for a more realistic perspective effect
+          const scale = Math.pow(linearScale, 2);
+
+          const rectWidth = horizonWidth + (width - horizonWidth) * scale;
+          const rectHeight = horizonHeight + (height - horizonHeight) * scale;
+          const rectX = (width - rectWidth) / 2;
+          const rectY = (height - rectHeight) / 2;
+          
+          // Opacity is 0 at the center and fades in towards the edge.
+          const alpha = linearScale;
+          ctx.strokeStyle = `${lineColor}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`;
+          
+          ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+        }
+      };
+
+      drawAnimatedGrid();
+      drawConvergingLines();
+    };
+
+    const animate = () => {
+      if (animationStarted) {
+        frameCount.current++;
+        draw();
+      }
+      animationFrameId.current = requestAnimationFrame(animate);
+    };
+
+    if (animationStarted) {
+      setOpacity(maxOpacity);
+      animate();
+    } else {
+      setOpacity(0);
+    }
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, [numLines, lineColor, animationSpeed, animationStarted, maxOpacity]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
+        opacity: opacity,
+        transition: 'opacity 2s ease-in',
+        background: 'black',
+      }}
+    />
+  );
+};
+
+export default PerspectiveGridTunnel;

@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PerspectiveGridTunnel from '../components/PerspectiveGridTunnel.jsx';
+---
+
+<Layout title="Grid Test">
+  <PerspectiveGridTunnel client:load animationStarted={true} numLines={12} animationSpeed={0.1} maxOpacity={0.1} />
+</Layout>
