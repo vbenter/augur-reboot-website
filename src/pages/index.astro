@@ -1,12 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Typewriter from '../components/Typewriter.jsx';
+import TypewriterSequence from '../components/TypewriterSequence.jsx';
+
+const sentences = [
+  "system booting up",
+  "fetching updates... done!",
+  "initializing updates"
+];
 ---
 
 <Layout title="Welcome to Astro.">
 	<main>
 		<div class="flex flex-col items-center justify-center h-screen">
-			<Typewriter client:load text="Hello, Astro and React!" />
+			<TypewriterSequence client:load sentences={sentences} defaultTypingSpeed={60} delayBetweenSentences={500} holdDuration={1500} />
 		</div>
 	</main>
 </Layout>

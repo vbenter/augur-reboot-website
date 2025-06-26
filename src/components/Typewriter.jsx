@@ -1,25 +1,39 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-const Typewriter = ({ text, typingSpeed = 60 }) => {
+const Typewriter = ({ segments, defaultTypingSpeed = 60, onComplete }) => {
   const [displayedText, setDisplayedText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const cursorRef = useRef(null);
 
   useEffect(() => {
-    if (currentIndex < text.length) {
-      const typingTimer = setTimeout(() => {
-        setDisplayedText(text.substring(0, currentIndex + 1));
-        setCurrentIndex(prevIndex => prevIndex + 1);
-      }, typingSpeed);
-      return () => clearTimeout(typingTimer);
+    if (currentSegmentIndex < segments.length) {
+      const currentSegment = segments[currentSegmentIndex];
+      const segmentText = currentSegment.value;
+      const segmentSpeed = currentSegment.speed || defaultTypingSpeed;
+
+      if (currentCharIndex < segmentText.length) {
+        const typingTimer = setTimeout(() => {
+          setDisplayedText(prev => prev + segmentText[currentCharIndex]);
+          setCurrentCharIndex(prev => prev + 1);
+        }, segmentSpeed);
+        return () => clearTimeout(typingTimer);
+      } else {
+        // Current segment finished, move to next
+        setCurrentSegmentIndex(prev => prev + 1);
+        setCurrentCharIndex(0); // Reset char index for next segment
+      }
     } else {
-      // Typing is complete, activate blinking
+      // All segments typed, activate blinking and call onComplete
       if (cursorRef.current) {
         cursorRef.current.classList.add('blink-active');
       }
+      if (onComplete) {
+        onComplete();
+      }
     }
-  }, [currentIndex, text, typingSpeed]);
+  }, [currentSegmentIndex, currentCharIndex, segments, defaultTypingSpeed, onComplete]);
 
   return (
     <span className="typewriter-text font-press-start">
