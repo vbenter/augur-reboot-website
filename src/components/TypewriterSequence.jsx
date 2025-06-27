@@ -41,7 +41,7 @@ const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSe
   }
 
   return (
-    <>
+    <span className='uppercase text-green-500'>
       {showTypewriter && (
         <Typewriter
           segments={getSegmentsForSentence(sentences[currentSentenceIndex])}
@@ -49,7 +49,7 @@ const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSe
           onComplete={handleComplete}
         />
       )}
-    </>
+    </span>
   );
 };
 

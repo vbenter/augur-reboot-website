@@ -1,11 +1,22 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import InteractiveBackground from '../components/InteractiveBackground.jsx';
-
+import PerspectiveGridTunnel from '../components/PerspectiveGridTunnel.jsx';
+import HeroBanner from '../components/HeroBanner.astro';
 ---
 
 <Layout title="Welcome to Astro.">
-  <InteractiveBackground client:load />
+  <PerspectiveGridTunnel client:load animationStarted={true} numLines={12} animationSpeed={0.1} maxOpacity={0.1} lineColor="#2AE7A8" />
+  <div id="hero-banner-container" style="opacity: 0; transition: opacity 1s ease-in;" class="absolute inset-0">
+    <HeroBanner />
+  </div>
 </Layout>
 
-
+<script is:inline>
+	const heroBannerContainer = document.getElementById('hero-banner-container');
+	if (heroBannerContainer) {
+		setTimeout(() => {
+			console.log('appear')
+			heroBannerContainer.style.opacity = '1';
+		}, 2000); // 2 seconds delay for grid fade-in
+	}
+</script>

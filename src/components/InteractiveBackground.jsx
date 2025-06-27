@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import TypewriterSequence from './TypewriterSequence.jsx';
 import PerspectiveGridTunnel from './PerspectiveGridTunnel.jsx';
+import { HeroBanner } from './HeroBanner.jsx';
 
 const sentences = [
   "system booting up",
@@ -26,7 +27,8 @@ const InteractiveBackground = () => {
           onSequenceComplete={handleTypewriterComplete}
         />
       </div>
-      <PerspectiveGridTunnel animationStarted={gridAnimationStarted} />
+      <HeroBanner />
+      <PerspectiveGridTunnel client:load animationStarted={gridAnimationStarted} numLines={12} animationSpeed={0.25} maxOpacity={0.1} lineColor="#2AE7A8" />
     </>
   );
 };
