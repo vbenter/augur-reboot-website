@@ -41,6 +41,7 @@ const PerspectiveGridTunnel = ({
       const horizonHeight = height * 0.15;
       const horizonX = (width - horizonWidth) / 2;
       const horizonY = (height - horizonHeight) / 2;
+      const vanishingPoint = 0.75;
 
       // --- 1. Draw STATIC Converging Lines with Gradient Opacity ---
       const drawConvergingLines = () => {
@@ -55,7 +56,7 @@ const PerspectiveGridTunnel = ({
           
           let gradient = ctx.createLinearGradient(x1_top, y1_top, x2_top, y2_top);
           gradient.addColorStop(0, `${lineColor}ff`); // Opaque at the edge
-          gradient.addColorStop(1, `${lineColor}00`); // Transparent at the horizon
+          gradient.addColorStop(vanishingPoint, `${lineColor}00`); // Transparent at the horizon
           ctx.strokeStyle = gradient;
           ctx.beginPath(); ctx.moveTo(x1_top, y1_top); ctx.lineTo(x2_top, y2_top); ctx.stroke();
 
@@ -64,7 +65,7 @@ const PerspectiveGridTunnel = ({
           const y2_bot = horizonY + horizonHeight;
           gradient = ctx.createLinearGradient(x1_top, y1_bot, x2_top, y2_bot);
           gradient.addColorStop(0, `${lineColor}ff`);
-          gradient.addColorStop(1, `${lineColor}00`);
+          gradient.addColorStop(vanishingPoint, `${lineColor}00`);
           ctx.strokeStyle = gradient;
           ctx.beginPath(); ctx.moveTo(x1_top, y1_bot); ctx.lineTo(x2_top, y2_bot); ctx.stroke();
 
@@ -75,7 +76,7 @@ const PerspectiveGridTunnel = ({
           const y2_left = horizonY + ratio * horizonHeight;
           gradient = ctx.createLinearGradient(x1_left, y1_left, x2_left, y2_left);
           gradient.addColorStop(0, `${lineColor}ff`);
-          gradient.addColorStop(1, `${lineColor}00`);
+          gradient.addColorStop(vanishingPoint, `${lineColor}00`);
           ctx.strokeStyle = gradient;
           ctx.beginPath(); ctx.moveTo(x1_left, y1_left); ctx.lineTo(x2_left, y2_left); ctx.stroke();
           
@@ -84,7 +85,7 @@ const PerspectiveGridTunnel = ({
           const x2_right = horizonX + horizonWidth;
           gradient = ctx.createLinearGradient(x1_right, y1_left, x2_right, y2_left);
           gradient.addColorStop(0, `${lineColor}ff`);
-          gradient.addColorStop(1, `${lineColor}00`);
+          gradient.addColorStop(vanishingPoint, `${lineColor}00`);
           ctx.strokeStyle = gradient;
           ctx.beginPath(); ctx.moveTo(x1_right, y1_left); ctx.lineTo(x2_right, y2_left); ctx.stroke();
         }
@@ -94,7 +95,7 @@ const PerspectiveGridTunnel = ({
       const drawAnimatedGrid = () => {
         const zOffset = frameCount.current * animationSpeed;
         const segmentLength = 40;
-        const totalSegments = 20;
+        const totalSegments = 15;
 
         for (let i = 0; i < totalSegments; i++) {
           const z = (i * segmentLength) + (zOffset % segmentLength);
@@ -103,7 +104,7 @@ const PerspectiveGridTunnel = ({
           if (linearScale > 1 || linearScale < 0) continue;
 
           // Use an exponential scale for a more realistic perspective effect
-          const scale = Math.pow(linearScale, 2);
+          const scale = Math.pow(linearScale, 2.5);
 
           const rectWidth = horizonWidth + (width - horizonWidth) * scale;
           const rectHeight = horizonHeight + (height - horizonHeight) * scale;
@@ -111,7 +112,7 @@ const PerspectiveGridTunnel = ({
           const rectY = (height - rectHeight) / 2;
           
           // Opacity is 0 at the center and fades in towards the edge.
-          const alpha = linearScale;
+          const alpha = Math.pow(linearScale, 5);
           ctx.strokeStyle = `${lineColor}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`;
           
           ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);

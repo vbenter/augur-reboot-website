@@ -36,7 +36,7 @@ const Typewriter = ({ segments, defaultTypingSpeed = 60, onComplete }) => {
   }, [currentSegmentIndex, currentCharIndex, segments, defaultTypingSpeed, onComplete]);
 
   return (
-    <span className="typewriter-text font-press-start">
+    <span className="typewriter-text font-console">
       {displayedText}
       <span ref={cursorRef} className="cursor">
         █

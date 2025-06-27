@@ -9,6 +9,7 @@ This is a static website built with [Astro](https://astro.build/) and designed f
 - **Framework:** Astro
 - **Deployment:** Cloudflare Pages
 - **Package Manager:** npm
+- **Styling:** Tailwind CSS v4 (configured via CSS variables in `src/styles/global.css`, no `tailwind.config.cjs`)
 
 ## Development
 

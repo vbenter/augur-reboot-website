@@ -14,13 +14,26 @@
   visibility: hidden;
 }
 
-.font-press-start {
-  font-family: "Press Start 2P", cursive;
-  text-transform: uppercase;
+@theme {
+  --color-primary: #2AE7A8;
+  --color-foreground: #ffffff;
+  --color-background: #111111;
+
+  --font-console: "Press Start 2P", monospace;
+  --font-barlow: "Barlow", sans-serif;
 }
 
 @keyframes blink-animation {
   to {
     visibility: hidden;
   }
+}
+
+.title {
+  background: linear-gradient(to bottom, var(--color-primary), #008000);
+  background-size: 100% 200%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-animation 3s linear infinite;
+  filter: drop-shadow(0 4px 0 #ffffff15);
 }
