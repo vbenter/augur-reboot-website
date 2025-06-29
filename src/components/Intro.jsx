@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CrtDisplay from './CrtDisplay.tsx';
 import TypewriterSequence from './TypewriterSequence.jsx';
 
 const bootSentences = [
   "", // Start with a blank line for the "warm-up"
   "BOOT SEQUENCE INITIATED",
-  "PERFORMING SYSTEM CHECKS...UPDATE REQUIRED",
-  "FETCHIN UPDATES...",
+  "PERFORMING SYSTEM CHECKS... UPDATE REQUIRED",
+  " UPDATES...",
   "SYSTEM REBOOT INITIALIZED"
 ];
 

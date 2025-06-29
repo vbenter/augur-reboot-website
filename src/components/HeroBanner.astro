@@ -2,7 +2,7 @@
 import AugurLogo from '../assets/augur.svg';
 ---
 
-<div id="hero-banner-container" class="fixed p-8 inset-0 flex flex-col justify-center items-center text-primary font-barlow z-10 text-center">
+<div id="hero-banner-container" class="fixed p-8 inset-0 flex flex-col justify-center items-center text-primary font-barlow z-10 text-center min-h-[500px]">
   <div id="social-links" class="absolute top-8 right-10 flex gap-2.5">
     <a id="discord-link" href="#" class="text-primary no-underline font-console text-lg">D</a>
     <a id="twitter-link" href="#" class="text-primary no-underline font-console text-lg">T</a>
@@ -10,15 +10,15 @@ import AugurLogo from '../assets/augur.svg';
 
   <AugurLogo id="augur-logo" class:list="text-9xl" />
   
-  <h2 class="font-press-start text-[2.5em] my-5 flex items-center gap-5 title">
+  <p id="prediction-market-text" class="font-barlow border border-primary/30 px-3 py-1 text-lg my-5 tracking-[0.22em] leading-tight text-foreground">
+    THE FRONTIER OF PREDICTION MARKET
+  </p>
+
+  <h2 class="font-press-start text-[2.5em] flex items-center gap-5 title">
     <span id="line-left" class="w-[50px] h-[1px] bg-foreground"></span>
     <span id="is-rebooting-text" class="title font-console text-3xl md:text-[2.5rem]">IS REBOOTING</span>
     <span id="line-right" class="w-[50px] h-[1px] bg-foreground"></span>
   </h2>
-
-  <p id="prediction-market-text" class="font-barlow border border-primary/30 px-3 py-1 text-lg mt-0 tracking-[0.22em] leading-tight text-foreground">
-    THE FRONTIER OF PREDICTION MARKET
-  </p>
 
   <div id="menu-items-container" class="flex flex-col place-items-center font-console mt-12 text-left w-full max-w-3xl mx-auto">
     <a href="#" class="text-base my-2.5 block">
@@ -130,7 +130,7 @@ import AugurLogo from '../assets/augur.svg';
     const logoScaleDownResetDuration = 1000; // Duration of logo scale down and reset position
 
     // Calculate the total time for the logo's complete animation sequence
-    const logoCompleteTime = logoInitialDelay + logoFadeInDuration + logoPauseDuration + logoScaleDownResetDuration;
+    const logoAnimationDuration = logoInitialDelay + logoFadeInDuration + logoPauseDuration + logoScaleDownResetDuration;
 
     const bufferBetweenAnimations = 200; // Small buffer between animation steps
 
@@ -157,21 +157,22 @@ import AugurLogo from '../assets/augur.svg';
       if (augurLogo) augurLogo.classList.add('scale-down-and-reset-position');
     }, logoInitialDelay + logoFadeInDuration + logoPauseDuration);
 
+    // "the frontier of prediction market" Animation
+    setTimeout(() => {
+      if (predictionMarketText) predictionMarketText.classList.add('animate-in');
+    }, logoAnimationDuration + bufferBetweenAnimations);
+
     // Lines Animation
     setTimeout(() => {
       if (lineLeft) lineLeft.classList.add('animate-in');
       if (lineRight) lineRight.classList.add('animate-in');
-    }, logoCompleteTime + bufferBetweenAnimations);
+    }, logoAnimationDuration + bufferBetweenAnimations + bufferBetweenAnimations);
 
     // "is rebooting" Animation
     setTimeout(() => {
       if (isRebootingText) isRebootingText.classList.add('animate-in');
-    }, logoCompleteTime + bufferBetweenAnimations + linesAnimationDuration + bufferBetweenAnimations);
+    }, logoAnimationDuration + bufferBetweenAnimations + linesAnimationDuration + bufferBetweenAnimations + isRebootingAnimationDuration + bufferBetweenAnimations);
 
-    // "the frontier of prediction market" Animation
-    setTimeout(() => {
-      if (predictionMarketText) predictionMarketText.classList.add('animate-in');
-    }, logoCompleteTime + bufferBetweenAnimations + linesAnimationDuration + bufferBetweenAnimations + isRebootingAnimationDuration + bufferBetweenAnimations);
 
     // Sequential Menu Items Animation
     setTimeout(() => {
@@ -180,6 +181,6 @@ import AugurLogo from '../assets/augur.svg';
           item.classList.add('animate-in');
         }, index * menuItemStagger);
       });
-    }, logoCompleteTime + bufferBetweenAnimations + linesAnimationDuration + bufferBetweenAnimations + isRebootingAnimationDuration + bufferBetweenAnimations + predictionMarketAnimationDuration + bufferBetweenAnimations);
+    }, logoAnimationDuration + bufferBetweenAnimations + linesAnimationDuration + bufferBetweenAnimations + isRebootingAnimationDuration + bufferBetweenAnimations + predictionMarketAnimationDuration + bufferBetweenAnimations);
   });
 </script>
