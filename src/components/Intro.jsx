@@ -3,10 +3,11 @@ import CrtDisplay from './CrtDisplay.tsx';
 import TypewriterSequence from './TypewriterSequence.jsx';
 
 const bootSentences = [
-  "BOOT SEQUENCE INITIATED...",
-  "UPDATE REQUIRED...",
-  "INSTALLING...",
-  "SYSTEM REBOOT REQUIRED"
+  "", // Start with a blank line for the "warm-up"
+  "BOOT SEQUENCE INITIATED",
+  "PERFORMING SYSTEM CHECKS...UPDATE REQUIRED",
+  "FETCHIN UPDATES...",
+  "SYSTEM REBOOT INITIALIZED"
 ];
 
 const Intro = () => {
@@ -40,25 +41,21 @@ const Intro = () => {
   }
 
   return (
-    <>
+    <CrtDisplay isPoweredUp={isPoweredOn}>
       <button
         onClick={handleSkip}
-        className="fixed top-4 right-4 z-50 px-3 py-1 font-console text-primary bg-black bg-opacity-50 border border-primary/50 rounded hover:bg-primary hover:text-black transition-colors duration-300"
+        className="fixed top-8 right-10 z-50 font-console text-green-500 hover:text-foreground transition-colors duration-300 cursor-pointer"
       >
-        SKIP
+        &gt; SKIP
       </button>
-      <CrtDisplay isPoweredUp={isPoweredOn}>
-        <div className="flex items-center justify-center h-screen">
-          <TypewriterSequence
-            sentences={bootSentences}
-            defaultTypingSpeed={40}
-            holdDuration={1000}
-            delayBetweenSentences={500}
-            onSequenceComplete={handleSequenceComplete}
-          />
-        </div>
-      </CrtDisplay>
-    </>
+      <div className="flex items-center justify-center h-screen font-console uppercase text-green-500">
+        <TypewriterSequence
+          sentences={bootSentences}
+          defaultTypingSpeed={40}
+          onSequenceComplete={handleSequenceComplete}
+        />
+      </div>
+    </CrtDisplay>
   );
 };
 

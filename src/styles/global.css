@@ -33,7 +33,7 @@
   0% {
     transform: scale(1, 0.8) translate3d(0, 0, 0);
     -webkit-filter: brightness(30);
-    filter: brightness(30);
+    filter: blur(0.75px) brightness(30);
     opacity: 1;
   }
   13.5% {
@@ -46,19 +46,19 @@
   19% {
     transform: scale(1.3, 0.6) translate3d(0, 100%, 0);
     -webkit-filter: brightness(30);
-    filter: brightness(30);
+    filter: blur(0.75px) brightness(30);
     opacity: 0;
   }
   31% {
     transform: scale(1, 1) translate3d(0, 0, 0);
     -webkit-filter: contrast(0) brightness(0);
-    filter: contrast(0) brightness(0);
+    filter: blur(0.75px) contrast(0) brightness(0);
     opacity: 0;
   }
   100% {
     transform: scale(1, 1) translate3d(0, 0, 0);
     -webkit-filter: contrast(1) brightness(1.2) saturate(1.3);
-    filter: contrast(1) brightness(1.2) saturate(1.3);
+    filter: blur(0.75px) contrast(1) brightness(1.2) saturate(1.3);
     opacity: 1;
   }
 }
@@ -88,6 +88,8 @@
   background-size: cover;
   background-size: 100% 3px;
   filter: blur(0.75px);
+
+  text-shadow: 0 0 10px #00ff0066;
 
   &.display-on {
     animation: crt-on 0.5s;

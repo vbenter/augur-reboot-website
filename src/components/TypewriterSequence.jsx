@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import Typewriter from './Typewriter.jsx';
 
-const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSentences = 1000, holdDuration = 1500, onSequenceComplete }) => {
+const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSentences = 300, holdDuration = 2500, onSequenceComplete }) => {
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [showTypewriter, setShowTypewriter] = useState(true);
 
   const getSegmentsForSentence = (sentence) => {
-    if (sentence === "fetching updates... done!") {
-      return [
-        { value: "fetching updates", speed: defaultTypingSpeed },
-        { value: "...", speed: 200 }, // Slower speed for ellipses
-        { value: " done!", speed: defaultTypingSpeed },
-      ];
-    } else {
-      return [{ value: sentence, speed: defaultTypingSpeed }];
+    const parts = sentence.split(/(\.\.\.)/);
+    if (parts.length > 1) {
+      return parts.filter(part => part).map(part => {
+        if (part === "...") {
+          return { value: part, speed: defaultTypingSpeed * 12 };
+        }
+        return { value: part, speed: defaultTypingSpeed };
+      });
     }
+    return [{ value: sentence, speed: defaultTypingSpeed }];
   };
 
   const handleComplete = () => {

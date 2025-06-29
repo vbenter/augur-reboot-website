@@ -6,7 +6,7 @@ type Props = PropsWithChildren<{ isPoweredUp?: boolean }>
 const CrtDisplay = ({ children, isPoweredUp: isPoweredOn = true }: Props) => {
         const animationClass = isPoweredOn ? "display-on" : "display-off"
     return (
-        <div className={cn("crt fixed inset-0 w-screen h-screen", animationClass)}>
+        <div className={cn("crt fixed inset-0 w-screen h-screen z-30", animationClass)}>
             {children}
         </div>
     )

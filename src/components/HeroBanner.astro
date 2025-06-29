@@ -3,9 +3,9 @@ import AugurLogo from '../assets/augur.svg';
 ---
 
 <div id="hero-banner-container" class="fixed p-8 inset-0 flex flex-col justify-center items-center text-primary font-barlow z-10 text-center">
-  <div class="absolute top-5 right-5 flex gap-2.5">
-    <a href="#" class="text-primary no-underline font-console text-lg">D</a>
-    <a href="#" class="text-primary no-underline font-console text-lg">T</a>
+  <div id="social-links" class="absolute top-8 right-10 flex gap-2.5">
+    <a id="discord-link" href="#" class="text-primary no-underline font-console text-lg">D</a>
+    <a id="twitter-link" href="#" class="text-primary no-underline font-console text-lg">T</a>
   </div>
 
   <AugurLogo id="augur-logo" class:list="text-9xl" />
@@ -34,6 +34,19 @@ import AugurLogo from '../assets/augur.svg';
 </div>
 
 <style>
+  #discord-link,
+  #twitter-link {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.5s ease-out;
+  }
+
+  #discord-link.animate-in,
+  #twitter-link.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   #augur-logo {
     opacity: 0;
     transform: scale(2) translateY(50%); /* Start scaled up, slightly offset from top */
@@ -102,6 +115,8 @@ import AugurLogo from '../assets/augur.svg';
 
 <script>
   document.addEventListener('introFinished', () => {
+    const discordLink = document.getElementById('discord-link');
+    const twitterLink = document.getElementById('twitter-link');
     const augurLogo = document.getElementById('augur-logo');
     const isRebootingText = document.getElementById('is-rebooting-text');
     const lineLeft = document.getElementById('line-left');
@@ -123,6 +138,15 @@ import AugurLogo from '../assets/augur.svg';
     const isRebootingAnimationDuration = 800;
     const predictionMarketAnimationDuration = 800;
     const menuItemStagger = 200;
+    const linkStagger = 200;
+
+    // Animate D and T links
+    setTimeout(() => {
+      if (discordLink) discordLink.classList.add('animate-in');
+      setTimeout(() => {
+        if (twitterLink) twitterLink.classList.add('animate-in');
+      }, linkStagger);
+    }, 0);
 
     // Logo Animation Sequence
     setTimeout(() => {
