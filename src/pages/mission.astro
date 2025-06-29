@@ -1,0 +1,301 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PerspectiveGridTunnel from "../components/PerspectiveGridTunnel.tsx";
+import SocialLinks from "../components/SocialLinks.astro";
+import AugurLogo from "../assets/augur.svg"
+---
+
+<Layout title="Mission - Augur">
+  <PerspectiveGridTunnel client:load animationStarted={true} numLines={12} animationSpeed={0.1} maxOpacity={0.1} lineColor="#2AE7A8" />
+  <div class="max-w-screen-xl mx-auto px-4 md:px-8">
+    <SocialLinks />
+    <!-- MAIN CONTENT -->
+    <main class="py-16">
+      <h1
+        class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mb-24"
+      >
+        <span class="title-icon"></span>
+        Updates in Progress
+      </h1>
+
+      <div class="max-w-4xl mx-auto">
+        <!-- Group 1: Protocol Architecture -->
+        <div
+          class="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 mb-16 items-start"
+        >
+          <h2 class="text-white text-xl font-bold lg:text-right lg:pr-8">
+            Protocol Architecture Overhaul
+          </h2>
+          <div class="detail-marker">
+            <div class="mb-8">
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                MODULAR CORE CONTRACTS
+              </h3>
+              <p class="text-sm leading-relaxed">
+                SPLITS MONOLITHIC AUGUR CONTRACT INTO MARKET, SETTLEMENT, &
+                TREASURY MODULES ENABLES PERMISSIONLESS UPGRADES OF INDIVIDUAL
+                MODULES VIA GOVERNANCE
+              </p>
+            </div>
+            <div>
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                LAYER-2 NATIVE SETTLEMENT
+              </h3>
+              <p class="text-sm leading-relaxed">
+                PRIMARY TRADE MATCHING AND SETTLEMENT MIGRATED TO OPTIMISTIC
+                ROLLUP (E.G. BASE) FINALITY PROOFS BATCHED TO ETHEREUM L1 EVERY
+                4 HOURS
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 2: Oracle System -->
+        <div
+          class="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 mb-16 items-start"
+        >
+          <h2 class="text-white text-xl font-bold lg:text-right lg:pr-8">
+            Oracle System 2.0
+          </h2>
+          <div class="detail-marker">
+            <div class="mb-8">
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                HYBRID ORACLE COUNCIL
+              </h3>
+              <p class="text-sm leading-relaxed">
+                COMBINES EXISTING REP-STAKING DISPUTE MECHANISM WITH ELECTED
+                "DATA DELEGATES" DELEGATES SLASHED FOR MIS-REPORTS, VOTERS
+                REWARDED FOR TIMELY CHALLENGES
+              </p>
+            </div>
+            <div>
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                PROOF-OF-REALITY FEEDS
+              </h3>
+              <p class="text-sm leading-relaxed">
+                INTRODUCES STANDARDIZED ON-CHAIN DATA ATTESTATIONS SIGNED BY
+                REPUTABLE PUBLISHERS (APIS & NEWS DESKS) MARKETS CAN OPT-IN TO
+                AUTOMATIC FINALIZATION IF QUORUM OF FEEDS AGREE
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 3: Governance -->
+        <div
+          class="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 mb-16 items-start"
+        >
+          <h2 class="text-white text-xl font-bold lg:text-right lg:pr-8">
+            Governance & REP-V4 Tokenomics
+          </h2>
+          <div class="detail-marker">
+            <div class="mb-8">
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                SUPPLY CONSOLIDATION
+              </h3>
+              <p class="text-sm leading-relaxed">
+                3:1 MERGE OF REPV2 AND REPV3 INTO NEW ERC-20 "REPX" SNAPSHOT
+                AIRDROP AT BLOCK X TO UNIFY LIQUIDITY POOLS
+              </p>
+            </div>
+            <div class="mb-8">
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                QUADRATIC VOTING FOR PROPOSALS
+              </h3>
+              <p class="text-sm leading-relaxed">
+                LIMITS WHALE DOMINANCE; STAKED REPX VOTES WEIGHTED BY
+                SQUARE-ROOT FUNCTION
+              </p>
+            </div>
+            <div>
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                DYNAMIC INFLATION SCHEDULE
+              </h3>
+              <p class="text-sm leading-relaxed">
+                1% BASE INFLATION ROUTED TO: 60% MARKET CREATION REWARD 30%
+                ORACLE COUNCIL BUDGET 10% DEV DAO GRANTS
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 4: Liquidity -->
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 items-start">
+          <h2 class="text-white text-xl font-bold lg:text-right lg:pr-8">
+            Liquidity & Market Incentives
+          </h2>
+          <div class="detail-marker">
+            <div class="mb-8">
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                AMM-BACKED ORDER BOOKS
+              </h3>
+              <p class="text-sm leading-relaxed">
+                UNFILLED ORDERS ROUTED TO AN INTERNAL CPMM POOL TO TIGHTEN
+                SPREADS
+              </p>
+            </div>
+            <div class="mb-8">
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                LIQUIDITY MINING 2.0
+              </h3>
+              <p class="text-sm leading-relaxed">
+                EPOCH-BASED REWARDS THAT AUTO-COMPOUND INTO LP SHARES
+              </p>
+            </div>
+            <div>
+              <h3 class="text-[#00FF9B] font-bold mb-2">
+                "INSTANT RESOLVE" PREDICTION SWAPS
+              </h3>
+              <p class="text-sm leading-relaxed">
+                CREATES OUTCOME-AGNOSTIC SYNTHETIC POSITIONS FOR RAPID HEDGING
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="max-w-screen-xl mx-auto px-4 md:px-8 py-16">
+    <div class="border border-[#00FF9B] p-8 md:p-12 mb-8">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1.5fr_1.5fr] gap-12"
+      >
+        <!-- Column 1: Logo & Tagline -->
+        <div class="md:col-span-2 lg:col-span-1">
+          <a href="#" class="text-7xl">
+            <!-- Footer Logo (White) -->
+             <AugurLogo />
+          </a>
+          <p class="text-white mt-4 text-sm">
+            THE FRONTIER OF PREDICTION MARKET
+          </p>
+        </div>
+        <!-- Column 2: Social -->
+        <div>
+          <h4 class="text-white mb-4">// SOCIAL</h4>
+          <ul class="space-y-2 text-sm">
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >GITHUB</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >X.COM (TWITTER)</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >DISCORD</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >TELEGRAM</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Column 3: REP -->
+        <div>
+          <h4 class="text-white mb-4">// REP</h4>
+          <ul class="space-y-2 text-sm">
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >REPV2 (ETHERSCAN)</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >REPV1 (ETHERSCAN)</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >REPV1/USD (KRAKEN)</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >REPV2/USD (KRAKEN)</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >REPV2/EUR (KRAKEN)</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >REPV2 UNISWAP</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >REPV2 UNISWAP GECKO UI</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Column 4: Companies & KB -->
+        <div>
+          <h4 class="text-white mb-4">// COMPANIES</h4>
+          <ul class="space-y-2 text-sm mb-6">
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >THE DARK FLORIST</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >LITUUS LABS</a>
+            </li>
+          </ul>
+          <h4 class="text-white mb-4">// KB</h4>
+          <ul class="space-y-2 text-sm">
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >AUGUR WHITEPAPER</a>
+            </li>
+            <li>
+              <a href="#" class="transition-colors hover:text-[#00FF9B]"
+                >AUGUR.GUIDE</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div
+      class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 pb-8"
+    >
+      <p>© 2025 AUGUR. ALL RIGHTS RESERVED.</p>
+      <nav class="flex gap-8">
+        <a href="#" class="transition-colors hover:text-[#00FF9B]"
+          >TERMS OF SERVICE</a
+        >
+        <a href="#" class="transition-colors hover:text-[#00FF9B]">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+</Layout>
+
+<style>
+  /* The icon used in the main "UPDATES IN PROGRESS" title */
+  .title-icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-color: #00ff9b;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0H7V7H0V0Z' fill='black'/%3E%3Cpath d='M0 13H7V20H0V13Z' fill='black'/%3E%3Cpath d='M13 0H20V7H13V0Z' fill='black'/%3E%3Cpath d='M13 13H20V20H13V13Z' fill='black'/%3E%3C/svg%3E%0A")
+      no-repeat center;
+    mask: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0H7V7H0V0Z' fill='black'/%3E%3Cpath d='M0 13H7V20H0V13Z' fill='black'/%3E%3Cpath d='M13 0H20V7H13V0Z' fill='black'/%3E%3Cpath d='M13 13H20V20H13V13Z' fill='black'/%3E%3C/svg%3E%0A")
+      no-repeat center;
+  }
+
+  /* The circular green marker for each detail section, created with a pseudo-element */
+  .detail-marker {
+    position: relative;
+    padding-left: 2rem; /* Spacing for the marker */
+  }
+
+  .detail-marker::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5rem; /* Vertically align with the first line of text */
+    width: 10px;
+    height: 10px;
+    border: 1px solid #00ff9b;
+    border-radius: 9999px; /* A large value to ensure it's a circle */
+  }
+</style>
