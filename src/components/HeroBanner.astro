@@ -6,14 +6,14 @@ import GithubLogo from '../assets/github.svg';
 ---
 
 <div id="hero-banner-container" class="fixed p-8 inset-0 flex flex-col justify-center items-center text-primary font-barlow z-10 text-center min-h-[500px]">
-  <div id="social-links" class="absolute top-8 right-10 flex gap-x-4">
+  <div id="social-links" class="absolute top-8 right-10 flex gap-x-8">
     <a id="twitter-link" href="https://x.com/AugurProject" class="text-primary hover:text-foreground no-underline font-console text-3xl">
       <XLogo />
     </a>
     <a id="discord-link" href="https://discord.gg/Y3tCZsSmz3" class="text-primary hover:text-foreground no-underline font-console text-3xl">
       <DiscordLogo />
     </a>
-    <a id="twitter-link" href="https://github.com/AugurProject/" class="text-primary hover:text-foreground no-underline font-console text-3xl">
+    <a id="github-link" href="https://github.com/AugurProject/" class="text-primary hover:text-foreground no-underline font-console text-3xl">
       <GithubLogo />
     </a>
   </div>
@@ -31,13 +31,13 @@ import GithubLogo from '../assets/github.svg';
   </h2>
 
   <div id="menu-items-container" class="flex flex-col place-items-center font-console mt-12 text-left w-full max-w-3xl mx-auto">
-    <a href="#" class="text-base my-2.5 block">
+    <a href="#" class="text-base py-1 block">
       <span>&gt;</span> REIMAGINED, TRANSFORMED, REFRESHED
     </a>
-    <a href="#" class="text-base my-2.5 block">
+    <a href="#" class="text-base py-1 block">
       THE VISIONARIES BEHIND AUGUR
     </a>
-    <a href="#" class="text-base my-2.5 block">
+    <a href="#" class="text-base py-1 block">
       IS MY REP SAFE?
     </a>
   </div>
@@ -83,6 +83,7 @@ import GithubLogo from '../assets/github.svg';
   /* --- Initial Animation States --- */
   #discord-link,
   #twitter-link,
+  #github-link,
   #is-rebooting-text,
   #line-left,
   #line-right,
@@ -97,32 +98,37 @@ import GithubLogo from '../assets/github.svg';
   }
 
   /* --- Animation Trigger --- */
-  #hero-banner-container.animations-started #discord-link {
-    animation: fade-in-down 0.5s ease-out 0s forwards;
-  }
   #hero-banner-container.animations-started #twitter-link {
-    animation: fade-in-down 0.5s ease-out 0.2s forwards;
+    animation: fade-in-down 0.5s ease-out 7.5s forwards;
+  }
+
+  #hero-banner-container.animations-started #discord-link {
+    animation: fade-in-down 0.5s ease-out 7.7s forwards;
+  }
+
+  #hero-banner-container.animations-started #github-link {
+    animation: fade-in-down 0.5s ease-out 7.9s forwards;
   }
 
   #hero-banner-container.animations-started #augur-logo {
     animation: 
-      logo-fade-in 0.5s ease-in 3s forwards,
-      logo-scale-down 1s ease-out 4.5s forwards;
+      logo-fade-in 0.5s ease-in 2s forwards,
+      logo-scale-down 1s ease-out 4s forwards;
   }
 
   #hero-banner-container.animations-started #prediction-market-text {
-    animation: fade-in-up 0.8s ease-out 5.7s forwards;
+    animation: fade-in-up 0.8s ease-out 5.2s forwards;
   }
 
   #hero-banner-container.animations-started #line-left {
-    animation: slide-in-from-right 0.25s ease-out 5.9s forwards;
+    animation: slide-in-from-right 0.25s ease-out 6.2s forwards;
   }
   #hero-banner-container.animations-started #line-right {
-    animation: slide-in-from-left 0.25s ease-out 5.9s forwards;
+    animation: slide-in-from-left 0.25s ease-out 6.2s forwards;
   }
 
   #hero-banner-container.animations-started #is-rebooting-text {
-    animation: scale-in 0.8s ease-out 7.1s forwards;
+    animation: scale-in 0.4s ease-in 6.5s forwards;
   }
 
   #hero-banner-container.animations-started #menu-items-container a:nth-of-type(1) {

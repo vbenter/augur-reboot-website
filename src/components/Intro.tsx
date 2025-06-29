@@ -7,8 +7,7 @@ const bootSentences: string[] = [
   "", // Start with a blank line for the "warm-up"
   "BOOT SEQUENCE INITIATED",
   "PERFORMING SYSTEM CHECKS... UPDATE REQUIRED",
-  " UPDATES...",
-  "SYSTEM REBOOT INITIALIZED"
+  "SYSTEM REBOOT INITIATED"
 ];
 
 const Intro: React.FC = () => {
