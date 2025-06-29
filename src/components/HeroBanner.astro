@@ -146,6 +146,24 @@ import GithubLogo from '../assets/github.svg';
     }
   }
 
+  /* --- Animation Skip State --- */
+  #hero-banner-container.animations-skipped #augur-logo {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  #hero-banner-container.animations-skipped #discord-link,
+  #hero-banner-container.animations-skipped #twitter-link,
+  #hero-banner-container.animations-skipped #github-link,
+  #hero-banner-container.animations-skipped #is-rebooting-text,
+  #hero-banner-container.animations-skipped #line-left,
+  #hero-banner-container.animations-skipped #line-right,
+  #hero-banner-container.animations-skipped #prediction-market-text,
+  #hero-banner-container.animations-skipped #menu-items-container a {
+    opacity: 1;
+    transform: none; /* Resets any initial transform */
+  }
+
   /* --- Animation Trigger --- */
   #hero-banner-container.animations-started #twitter-link {
     animation: fade-in-down 0.5s ease-out 7.5s forwards;
@@ -192,18 +210,27 @@ import GithubLogo from '../assets/github.svg';
 </style>
 
 <script>
-  document.addEventListener('introFinished', () => {
-    const heroBanner = document.getElementById('hero-banner-container');
-    if (heroBanner) {
-      heroBanner.classList.add('animations-started');
+  const heroBanner = document.getElementById('hero-banner-container');
+  const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
+  const urlParams = new URLSearchParams(window.location.search);
+  const skipIntro = urlParams.get('intro') === 'false';
 
-      // Set focus on the first menu item after animations complete.
-      // The last animation for menu items finishes at 7.7s + 0.5s duration = 8.2s.
-      // We set focus shortly after that.
-      setTimeout(() => {
-        const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
-        firstMenuItem?.focus();
-      }, 8300); // 8.3 seconds
-    }
-  });
+  if (skipIntro) {
+    heroBanner?.classList.add('animations-skipped');
+    // Use a minimal timeout to ensure the element is rendered and focusable.
+    setTimeout(() => firstMenuItem?.focus(), 0);
+  } else {
+    document.addEventListener('introFinished', () => {
+      if (heroBanner) {
+        heroBanner.classList.add('animations-started');
+
+        // Set focus on the first menu item after animations complete.
+        // The last animation for menu items finishes at 7.7s + 0.5s duration = 8.2s.
+        // We set focus shortly after that.
+        setTimeout(() => {
+          firstMenuItem?.focus();
+        }, 8300); // 8.3 seconds
+      }
+    });
+  }
 </script>
