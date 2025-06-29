@@ -5,41 +5,43 @@ import XLogo from '../assets/x.svg';
 import GithubLogo from '../assets/github.svg';
 ---
 
-<div id="hero-banner-container" class="fixed p-8 inset-0 flex flex-col justify-center items-center text-primary font-barlow z-10 text-center min-h-[500px]">
-  <div id="social-links" class="absolute top-8 right-10 flex gap-x-8">
-    <a id="twitter-link" href="https://x.com/AugurProject" class="text-primary hover:text-foreground no-underline font-console text-3xl">
-      <XLogo />
-    </a>
-    <a id="discord-link" href="https://discord.gg/Y3tCZsSmz3" class="text-primary hover:text-foreground no-underline font-console text-3xl">
-      <DiscordLogo />
-    </a>
-    <a id="github-link" href="https://github.com/AugurProject/" class="text-primary hover:text-foreground no-underline font-console text-3xl">
-      <GithubLogo />
-    </a>
-  </div>
+<div class="fixed inset-0 h-screen w-screen overflow-scroll place-content-center">
+  <div id="hero-banner-container" class="flex flex-col justify-center items-center text-primary font-barlow z-10 text-center min-h-[500px] overflow-y-scroll">
+    <div id="social-links" class="absolute top-8 right-10 flex gap-x-8">
+      <a id="twitter-link" href="https://x.com/AugurProject" class="text-primary hover:text-foreground focus:text-foreground no-underline font-console text-3xl">
+        <XLogo />
+      </a>
+      <a id="discord-link" href="https://discord.gg/Y3tCZsSmz3" class="text-primary hover:text-foreground focus:text-foreground no-underline font-console text-3xl">
+        <DiscordLogo />
+      </a>
+      <a id="github-link" href="https://github.com/AugurProject/" class="text-primary hover:text-foreground focus:text-foreground no-underline font-console text-3xl">
+        <GithubLogo />
+      </a>
+    </div>
 
-  <AugurLogo id="augur-logo" class:list="text-9xl" />
-  
-  <p id="prediction-market-text" class="font-barlow border border-primary/30 px-3 py-1 text-lg my-5 tracking-[0.22em] leading-tight text-foreground">
-    THE FRONTIER OF PREDICTION MARKET
-  </p>
+    <AugurLogo id="augur-logo" class:list="text-9xl" />
+    
+    <p id="prediction-market-text" class="font-barlow border border-primary/30 px-3 py-1 text-lg my-5 tracking-[0.22em] leading-tight text-foreground">
+      THE FRONTIER OF PREDICTION MARKET
+    </p>
 
-  <h2 class="font-press-start text-[2.5em] flex items-center gap-5 title">
-    <span id="line-left" class="w-[50px] h-[1px] bg-foreground"></span>
-    <span id="is-rebooting-text" class="title font-console text-3xl md:text-[2.5rem]">IS REBOOTING</span>
-    <span id="line-right" class="w-[50px] h-[1px] bg-foreground"></span>
-  </h2>
+    <h2 class="font-press-start text-[2.5em] flex items-center gap-5 title">
+      <span id="line-left" class="w-[50px] h-[1px] bg-foreground"></span>
+      <span id="is-rebooting-text" class="title font-console text-3xl md:text-[2.5rem]">IS REBOOTING</span>
+      <span id="line-right" class="w-[50px] h-[1px] bg-foreground"></span>
+    </h2>
 
-  <div id="menu-items-container" class="flex flex-col place-items-center font-console mt-12 text-left w-full max-w-3xl mx-auto">
-    <a href="#" class="text-base py-1 block">
-      <span>&gt;</span> REIMAGINED, TRANSFORMED, REFRESHED
-    </a>
-    <a href="#" class="text-base py-1 block">
-      THE VISIONARIES BEHIND AUGUR
-    </a>
-    <a href="#" class="text-base py-1 block">
-      IS MY REP SAFE?
-    </a>
+    <div id="menu-items-container" class="flex flex-col place-items-center font-console mt-12 text-left w-full max-w-3xl mx-auto">
+      <a id="first-menu-item" href="#" class="text-base py-1 block hover:text-foreground focus:text-foreground focus:outline-none">
+        REIMAGINED, TRANSFORMED, REFRESHED
+      </a>
+      <a href="#" class="text-base py-1 block hover:text-foreground focus:text-foreground focus:outline-none">
+        THE VISIONARIES BEHIND AUGUR
+      </a>
+      <a href="#" class="text-base py-1 block hover:text-foreground focus:text-foreground focus:outline-none">
+        IS MY REP SAFE?
+      </a>
+    </div>
   </div>
 </div>
 
@@ -80,6 +82,15 @@ import GithubLogo from '../assets/github.svg';
     to { opacity: 1; transform: translateX(0); }
   }
 
+  @keyframes bounce-horizontal {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(-8px);
+    }
+  }
+
   /* --- Initial Animation States --- */
   #discord-link,
   #twitter-link,
@@ -95,6 +106,44 @@ import GithubLogo from '../assets/github.svg';
   #augur-logo {
     opacity: 0;
     transform: scale(2) translateY(50%);
+  }
+
+  /* --- Menu Pointer (Semantic & Nested) --- */
+  #menu-items-container a {
+    position: relative; /* Needed for pseudo-element positioning */
+
+    &::before {
+      content: '>';
+      opacity: 0;
+      color: var(--color-foreground);
+      display: inline-block;
+      margin-right: 0.5rem;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    /* Default hover and focus behavior */
+    &:hover, &:focus {
+      color: var(--color-foreground);
+      &::before {
+        opacity: 1;
+        animation: bounce-horizontal 1s ease-in-out infinite;
+      }
+    }
+  }
+
+  /* --- Hover Priority (:has) --- */
+  /* When a link is being hovered inside the container... */
+  #menu-items-container:has(a:hover) {
+    /* ...target the link that is focused but NOT hovered. */
+    & a:focus:not(:hover) {
+      /* Revert its text color */
+      color: var(--color-primary);
+      /* Hide its pointer */
+      &::before {
+        opacity: 0;
+        animation: none;
+      }
+    }
   }
 
   /* --- Animation Trigger --- */
@@ -144,6 +193,17 @@ import GithubLogo from '../assets/github.svg';
 
 <script>
   document.addEventListener('introFinished', () => {
-    document.getElementById('hero-banner-container')?.classList.add('animations-started');
+    const heroBanner = document.getElementById('hero-banner-container');
+    if (heroBanner) {
+      heroBanner.classList.add('animations-started');
+
+      // Set focus on the first menu item after animations complete.
+      // The last animation for menu items finishes at 7.7s + 0.5s duration = 8.2s.
+      // We set focus shortly after that.
+      setTimeout(() => {
+        const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
+        firstMenuItem?.focus();
+      }, 8300); // 8.3 seconds
+    }
   });
 </script>
