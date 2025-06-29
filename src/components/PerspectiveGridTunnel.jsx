@@ -4,13 +4,26 @@ const PerspectiveGridTunnel = ({
   numLines = 20,
   lineColor = '#00ff00',
   animationSpeed = 1,
-  animationStarted = false,
+  animationStarted: initialAnimationStarted = false,
   maxOpacity = 1
 }) => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
   const frameCount = useRef(0);
   const [opacity, setOpacity] = useState(0);
+  const [animationStarted, setAnimationStarted] = useState(initialAnimationStarted);
+
+  useEffect(() => {
+    const handleIntroFinished = () => {
+      setAnimationStarted(true);
+    };
+
+    document.addEventListener('introFinished', handleIntroFinished);
+
+    return () => {
+      document.removeEventListener('introFinished', handleIntroFinished);
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;

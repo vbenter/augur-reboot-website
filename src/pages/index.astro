@@ -7,18 +7,6 @@ import HeroBanner from '../components/HeroBanner.astro';
 
 <Layout title="Augur is Rebooting">
   <Intro client:only="react" />
-
-  <div id="main-content" class="opacity-0 transition-opacity duration-1000">
-    <HeroBanner />
-    <PerspectiveGridTunnel client:load animationStarted={true} numLines={12} animationSpeed={0.1} maxOpacity={0.1} lineColor="#2AE7A8" />
-  </div>
+  <HeroBanner />
+  <PerspectiveGridTunnel client:load animationStarted={false} numLines={12} animationSpeed={0.1} maxOpacity={0.1} lineColor="#2AE7A8" />
 </Layout>
-
-<script>
-  document.addEventListener('introFinished', () => {
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-      mainContent.classList.remove('opacity-0');
-    }
-  });
-</script>
