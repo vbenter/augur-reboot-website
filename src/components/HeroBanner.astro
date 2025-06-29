@@ -1,11 +1,21 @@
 ---
 import AugurLogo from '../assets/augur.svg';
+import DiscordLogo from '../assets/discord.svg';
+import XLogo from '../assets/x.svg';
+import GithubLogo from '../assets/github.svg';
 ---
 
 <div id="hero-banner-container" class="fixed p-8 inset-0 flex flex-col justify-center items-center text-primary font-barlow z-10 text-center min-h-[500px]">
-  <div id="social-links" class="absolute top-8 right-10 flex gap-2.5">
-    <a id="discord-link" href="#" class="text-primary no-underline font-console text-lg">D</a>
-    <a id="twitter-link" href="#" class="text-primary no-underline font-console text-lg">T</a>
+  <div id="social-links" class="absolute top-8 right-10 flex gap-x-4">
+    <a id="twitter-link" href="https://x.com/AugurProject" class="text-primary hover:text-foreground no-underline font-console text-3xl">
+      <XLogo />
+    </a>
+    <a id="discord-link" href="https://discord.gg/Y3tCZsSmz3" class="text-primary hover:text-foreground no-underline font-console text-3xl">
+      <DiscordLogo />
+    </a>
+    <a id="twitter-link" href="https://github.com/AugurProject/" class="text-primary hover:text-foreground no-underline font-console text-3xl">
+      <GithubLogo />
+    </a>
   </div>
 
   <AugurLogo id="augur-logo" class:list="text-9xl" />
