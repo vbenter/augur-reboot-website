@@ -1,11 +1,12 @@
 import { type PropsWithChildren } from "react"
 import { cn } from "../lib/utils"
 
-type Props = PropsWithChildren<{ isPoweredOn?: boolean }>
+type Props = PropsWithChildren<{ isPoweredUp?: boolean }>
 
-const CrtDisplay = ({ children, isPoweredOn = true }: Props) => {
+const CrtDisplay = ({ children, isPoweredUp: isPoweredOn = true }: Props) => {
+        const animationClass = isPoweredOn ? "display-on" : "display-off"
     return (
-        <div className={cn("crt fixed inset-0 w-screen h-screen", isPoweredOn)}>
+        <div className={cn("crt fixed inset-0 w-screen h-screen", animationClass)}>
             {children}
         </div>
     )
