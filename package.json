@@ -1,5 +1,6 @@
 {
-	"name": "tease",
+	"name": "augur-website-teaser",
+	"description": "A teaser website for the upcoming Augur project.",
 	"type": "module",
 	"version": "0.0.1",
 	"scripts": {

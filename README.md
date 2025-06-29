@@ -1,6 +1,6 @@
-# Augur Teaser Website
+# Augur Website (Teaser)
 
-This repository contains the source code for the teaser website for the upcoming reboot of the Augur prediction market. The live site serves as a landing page to announce the redevelopment of Augur.
+This repository contains the source code for the teaser website for the upcoming reboot of the Augur prediction market. The live site serves as a landing page to announce the redevelopment of Augur, offering a glimpse into the future of decentralized forecasting.
 
 The future home of the Augur platform will be: **[https://augur.net](https://augur.net)**
 
