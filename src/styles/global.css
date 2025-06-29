@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 .cursor {
   display: inline-block;
   width: 0.5em;

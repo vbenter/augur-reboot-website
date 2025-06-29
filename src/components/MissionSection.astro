@@ -1,0 +1,55 @@
+---
+import MissionDetail from "./MissionDetail.astro";
+
+interface Detail {
+  title: string;
+  description: string;
+}
+
+interface Props {
+  title: string;
+  details: Detail[];
+  isLast?: boolean;
+}
+
+const { title, details, isLast = false } = Astro.props;
+---
+
+<div
+  class:list={[
+    "relative grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 items-start",
+    { "mb-16": !isLast },
+  ]}
+>
+  <h2 class="font-console text-white font-bold lg:text-right lg:pr-8">{title}</h2>
+  <div class="detail-marker">
+    {
+      details.map((detail) => (
+        <MissionDetail title={detail.title} description={detail.description} />
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  /* The circular green marker for each detail section, created with a pseudo-element */
+  .detail-marker {
+    position: relative;
+    padding-left: 2rem; /* Spacing for the marker */
+  }
+
+  .detail-marker::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5rem; /* Vertically align with the first line of text */
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-primary);
+    border-radius: 9999px; /* A large value to ensure it's a circle */
+  }
+
+  .detail-marker > :global(div:not(:last-child)) {
+    margin-bottom: 2rem; /* mb-8 */
+  }
+</style>
