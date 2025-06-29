@@ -34,153 +34,100 @@ import AugurLogo from '../assets/augur.svg';
 </div>
 
 <style>
-  #discord-link,
-  #twitter-link {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.5s ease-out;
+  /* --- Keyframe Definitions --- */
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  #discord-link.animate-in,
-  #twitter-link.animate-in {
-    opacity: 1;
-    transform: translateY(0);
+  @keyframes fade-in-down {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes logo-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes logo-scale-down {
+    from { transform: scale(2) translateY(50%); }
+    to { transform: scale(1) translateY(0); }
+  }
+
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes slide-in-from-right {
+    from { opacity: 0; transform: translateX(25px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slide-in-from-left {
+    from { opacity: 0; transform: translateX(-25px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* --- Initial Animation States --- */
+  #discord-link,
+  #twitter-link,
+  #is-rebooting-text,
+  #line-left,
+  #line-right,
+  #prediction-market-text,
+  #menu-items-container a {
+    opacity: 0;
   }
 
   #augur-logo {
     opacity: 0;
-    transform: scale(2) translateY(50%); /* Start scaled up, slightly offset from top */
-    transition: opacity 0.5s ease-in, transform 1s ease-out; /* Separate transitions for fade and scale/move */
+    transform: scale(2) translateY(50%);
   }
 
-  #augur-logo.fade-in {
-    opacity: 1;
+  /* --- Animation Trigger --- */
+  #hero-banner-container.animations-started #discord-link {
+    animation: fade-in-down 0.5s ease-out 0s forwards;
+  }
+  #hero-banner-container.animations-started #twitter-link {
+    animation: fade-in-down 0.5s ease-out 0.2s forwards;
   }
 
-  #augur-logo.scale-down-and-reset-position {
-    transform: scale(1) translateY(0); /* Scale down, move to natural position */
+  #hero-banner-container.animations-started #augur-logo {
+    animation: 
+      logo-fade-in 0.5s ease-in 3s forwards,
+      logo-scale-down 1s ease-out 4.5s forwards;
   }
 
-  #is-rebooting-text {
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.8s ease-out;
+  #hero-banner-container.animations-started #prediction-market-text {
+    animation: fade-in-up 0.8s ease-out 5.7s forwards;
   }
 
-  #is-rebooting-text.animate-in {
-    opacity: 1;
-    transform: scale(1);
+  #hero-banner-container.animations-started #line-left {
+    animation: slide-in-from-right 0.25s ease-out 5.9s forwards;
+  }
+  #hero-banner-container.animations-started #line-right {
+    animation: slide-in-from-left 0.25s ease-out 5.9s forwards;
   }
 
-  #line-left {
-    opacity: 0;
-    transform: translateX(25px); /* Start closer to center */
-    transition: all 0.25s ease-out; /* Snappy animation */
+  #hero-banner-container.animations-started #is-rebooting-text {
+    animation: scale-in 0.8s ease-out 7.1s forwards;
   }
 
-  #line-right {
-    opacity: 0;
-    transform: translateX(-25px); /* Start closer to center */
-    transition: all 0.25s ease-out; /* Snappy animation */
+  #hero-banner-container.animations-started #menu-items-container a:nth-of-type(1) {
+    animation: fade-in-up 0.5s ease-out 7.3s forwards;
   }
-
-  #line-left.animate-in,
-  #line-right.animate-in {
-    opacity: 1;
-    transform: translateX(0); /* Move to natural position */
+  #hero-banner-container.animations-started #menu-items-container a:nth-of-type(2) {
+    animation: fade-in-up 0.5s ease-out 7.5s forwards;
   }
-
-  #prediction-market-text {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.8s ease-out;
-  }
-
-  #prediction-market-text.animate-in {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  #menu-items-container a {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.5s ease-out;
-  }
-
-  #menu-items-container a.animate-in {
-    opacity: 1;
-    transform: translateY(0);
+  #hero-banner-container.animations-started #menu-items-container a:nth-of-type(3) {
+    animation: fade-in-up 0.5s ease-out 7.7s forwards;
   }
 </style>
 
 <script>
   document.addEventListener('introFinished', () => {
-    const discordLink = document.getElementById('discord-link');
-    const twitterLink = document.getElementById('twitter-link');
-    const augurLogo = document.getElementById('augur-logo');
-    const isRebootingText = document.getElementById('is-rebooting-text');
-    const lineLeft = document.getElementById('line-left');
-    const lineRight = document.getElementById('line-right');
-    const predictionMarketText = document.getElementById('prediction-market-text');
-    const menuItems = document.querySelectorAll('#menu-items-container a');
-
-    const logoInitialDelay = 3000; // Initial delay before logo starts
-    const logoFadeInDuration = 500; // Duration of logo fade-in
-    const logoPauseDuration = 1000; // Duration of logo pause after fade-in
-    const logoScaleDownResetDuration = 1000; // Duration of logo scale down and reset position
-
-    // Calculate the total time for the logo's complete animation sequence
-    const logoAnimationDuration = logoInitialDelay + logoFadeInDuration + logoPauseDuration + logoScaleDownResetDuration;
-
-    const bufferBetweenAnimations = 200; // Small buffer between animation steps
-
-    const linesAnimationDuration = 200;
-    const isRebootingAnimationDuration = 800;
-    const predictionMarketAnimationDuration = 800;
-    const menuItemStagger = 200;
-    const linkStagger = 200;
-
-    // Animate D and T links
-    setTimeout(() => {
-      if (discordLink) discordLink.classList.add('animate-in');
-      setTimeout(() => {
-        if (twitterLink) twitterLink.classList.add('animate-in');
-      }, linkStagger);
-    }, 0);
-
-    // Logo Animation Sequence
-    setTimeout(() => {
-      if (augurLogo) augurLogo.classList.add('fade-in');
-    }, logoInitialDelay);
-
-    setTimeout(() => {
-      if (augurLogo) augurLogo.classList.add('scale-down-and-reset-position');
-    }, logoInitialDelay + logoFadeInDuration + logoPauseDuration);
-
-    // "the frontier of prediction market" Animation
-    setTimeout(() => {
-      if (predictionMarketText) predictionMarketText.classList.add('animate-in');
-    }, logoAnimationDuration + bufferBetweenAnimations);
-
-    // Lines Animation
-    setTimeout(() => {
-      if (lineLeft) lineLeft.classList.add('animate-in');
-      if (lineRight) lineRight.classList.add('animate-in');
-    }, logoAnimationDuration + bufferBetweenAnimations + bufferBetweenAnimations);
-
-    // "is rebooting" Animation
-    setTimeout(() => {
-      if (isRebootingText) isRebootingText.classList.add('animate-in');
-    }, logoAnimationDuration + bufferBetweenAnimations + linesAnimationDuration + bufferBetweenAnimations + isRebootingAnimationDuration + bufferBetweenAnimations);
-
-
-    // Sequential Menu Items Animation
-    setTimeout(() => {
-      menuItems.forEach((item, index) => {
-        setTimeout(() => {
-          item.classList.add('animate-in');
-        }, index * menuItemStagger);
-      });
-    }, logoAnimationDuration + bufferBetweenAnimations + linesAnimationDuration + bufferBetweenAnimations + isRebootingAnimationDuration + bufferBetweenAnimations + predictionMarketAnimationDuration + bufferBetweenAnimations);
+    document.getElementById('hero-banner-container')?.classList.add('animations-started');
   });
 </script>
