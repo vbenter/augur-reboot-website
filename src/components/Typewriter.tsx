@@ -1,11 +1,22 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-const Typewriter = ({ segments, defaultTypingSpeed = 60, onComplete }) => {
+interface Segment {
+  value: string;
+  speed?: number;
+}
+
+interface TypewriterProps {
+  segments: Segment[];
+  defaultTypingSpeed?: number;
+  onComplete?: () => void;
+}
+
+const Typewriter: React.FC<TypewriterProps> = ({ segments, defaultTypingSpeed = 60, onComplete }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const cursorRef = useRef(null);
+  const cursorRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (currentSegmentIndex < segments.length) {

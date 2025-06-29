@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import CrtDisplay from './CrtDisplay.tsx';
-import TypewriterSequence from './TypewriterSequence.jsx';
+import TypewriterSequence from './TypewriterSequence.tsx';
 
-const bootSentences = [
+const bootSentences: string[] = [
   "", // Start with a blank line for the "warm-up"
   "BOOT SEQUENCE INITIATED",
   "PERFORMING SYSTEM CHECKS... UPDATE REQUIRED",
@@ -10,7 +11,7 @@ const bootSentences = [
   "SYSTEM REBOOT INITIALIZED"
 ];
 
-const Intro = () => {
+const Intro: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [isPoweredOn, setIsPoweredOn] = useState(true);
 

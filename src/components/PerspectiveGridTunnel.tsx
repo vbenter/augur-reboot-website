@@ -1,14 +1,23 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 
-const PerspectiveGridTunnel = ({
+interface PerspectiveGridTunnelProps {
+  numLines?: number;
+  lineColor?: string;
+  animationSpeed?: number;
+  animationStarted?: boolean;
+  maxOpacity?: number;
+}
+
+const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   numLines = 20,
   lineColor = '#00ff00',
   animationSpeed = 1,
   animationStarted: initialAnimationStarted = false,
-  maxOpacity = 1
+  maxOpacity = 1,
 }) => {
-  const canvasRef = useRef(null);
-  const animationFrameId = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameId = useRef<number | null>(null);
   const frameCount = useRef(0);
   const [opacity, setOpacity] = useState(0);
   const [animationStarted, setAnimationStarted] = useState(initialAnimationStarted);
@@ -31,7 +40,7 @@ const PerspectiveGridTunnel = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let width, height;
+    let width: number, height: number;
 
     const resizeCanvas = () => {
       width = canvas.width = window.innerWidth;
@@ -43,7 +52,7 @@ const PerspectiveGridTunnel = ({
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      
+
       // --- Style Setup ---
       ctx.lineWidth = 1.5;
       ctx.shadowBlur = 10;
@@ -66,12 +75,15 @@ const PerspectiveGridTunnel = ({
           const y1_top = 0;
           const x2_top = horizonX + ratio * horizonWidth;
           const y2_top = horizonY;
-          
+
           let gradient = ctx.createLinearGradient(x1_top, y1_top, x2_top, y2_top);
           gradient.addColorStop(0, `${lineColor}ff`); // Opaque at the edge
           gradient.addColorStop(vanishingPoint, `${lineColor}00`); // Transparent at the horizon
           ctx.strokeStyle = gradient;
-          ctx.beginPath(); ctx.moveTo(x1_top, y1_top); ctx.lineTo(x2_top, y2_top); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x1_top, y1_top);
+          ctx.lineTo(x2_top, y2_top);
+          ctx.stroke();
 
           // --- Gradient for Bottom lines ---
           const y1_bot = height;
@@ -80,7 +92,10 @@ const PerspectiveGridTunnel = ({
           gradient.addColorStop(0, `${lineColor}ff`);
           gradient.addColorStop(vanishingPoint, `${lineColor}00`);
           ctx.strokeStyle = gradient;
-          ctx.beginPath(); ctx.moveTo(x1_top, y1_bot); ctx.lineTo(x2_top, y2_bot); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x1_top, y1_bot);
+          ctx.lineTo(x2_top, y2_bot);
+          ctx.stroke();
 
           // --- Gradient for Left lines ---
           const x1_left = 0;
@@ -91,8 +106,11 @@ const PerspectiveGridTunnel = ({
           gradient.addColorStop(0, `${lineColor}ff`);
           gradient.addColorStop(vanishingPoint, `${lineColor}00`);
           ctx.strokeStyle = gradient;
-          ctx.beginPath(); ctx.moveTo(x1_left, y1_left); ctx.lineTo(x2_left, y2_left); ctx.stroke();
-          
+          ctx.beginPath();
+          ctx.moveTo(x1_left, y1_left);
+          ctx.lineTo(x2_left, y2_left);
+          ctx.stroke();
+
           // --- Gradient for Right lines ---
           const x1_right = width;
           const x2_right = horizonX + horizonWidth;
@@ -100,7 +118,10 @@ const PerspectiveGridTunnel = ({
           gradient.addColorStop(0, `${lineColor}ff`);
           gradient.addColorStop(vanishingPoint, `${lineColor}00`);
           ctx.strokeStyle = gradient;
-          ctx.beginPath(); ctx.moveTo(x1_right, y1_left); ctx.lineTo(x2_right, y2_left); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x1_right, y1_left);
+          ctx.lineTo(x2_right, y2_left);
+          ctx.stroke();
         }
       };
 
@@ -111,7 +132,7 @@ const PerspectiveGridTunnel = ({
         const totalSegments = 15;
 
         for (let i = 0; i < totalSegments; i++) {
-          const z = (i * segmentLength) + (zOffset % segmentLength);
+          const z = (i * segmentLength + zOffset) % (segmentLength * totalSegments);
           const linearScale = z / (totalSegments * segmentLength);
 
           if (linearScale > 1 || linearScale < 0) continue;
@@ -123,11 +144,13 @@ const PerspectiveGridTunnel = ({
           const rectHeight = horizonHeight + (height - horizonHeight) * scale;
           const rectX = (width - rectWidth) / 2;
           const rectY = (height - rectHeight) / 2;
-          
+
           // Opacity is 0 at the center and fades in towards the edge.
           const alpha = Math.pow(linearScale, 5);
-          ctx.strokeStyle = `${lineColor}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`;
-          
+          ctx.strokeStyle = `${lineColor}${Math.floor(alpha * 255)
+            .toString(16)
+            .padStart(2, '0')}`;
+
           ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
         }
       };

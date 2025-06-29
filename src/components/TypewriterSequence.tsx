@@ -1,19 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import Typewriter from './Typewriter.jsx';
 
-const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSentences = 300, holdDuration = 2500, onSequenceComplete }) => {
+import React, { useState, useEffect } from 'react';
+import Typewriter from './Typewriter.tsx';
+
+interface Segment {
+  value: string;
+  speed?: number;
+}
+
+interface TypewriterSequenceProps {
+  sentences: string[];
+  defaultTypingSpeed?: number;
+  delayBetweenSentences?: number;
+  holdDuration?: number;
+  onSequenceComplete?: () => void;
+}
+
+const TypewriterSequence: React.FC<TypewriterSequenceProps> = ({
+  sentences,
+  defaultTypingSpeed = 60,
+  delayBetweenSentences = 300,
+  holdDuration = 2500,
+  onSequenceComplete,
+}) => {
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [showTypewriter, setShowTypewriter] = useState(true);
 
-  const getSegmentsForSentence = (sentence) => {
+  const getSegmentsForSentence = (sentence: string): Segment[] => {
     const parts = sentence.split(/(\.\.\.)/);
     if (parts.length > 1) {
-      return parts.filter(part => part).map(part => {
-        if (part === "...") {
-          return { value: part, speed: defaultTypingSpeed * 12 };
-        }
-        return { value: part, speed: defaultTypingSpeed };
-      });
+      return parts
+        .filter(part => part)
+        .map(part => {
+          if (part === '...') {
+            return { value: part, speed: defaultTypingSpeed * 12 };
+          }
+          return { value: part, speed: defaultTypingSpeed };
+        });
     }
     return [{ value: sentence, speed: defaultTypingSpeed }];
   };
@@ -42,7 +64,7 @@ const TypewriterSequence = ({ sentences, defaultTypingSpeed = 60, delayBetweenSe
   }
 
   return (
-    <span className='uppercase text-green-500'>
+    <span className="uppercase text-green-500">
       {showTypewriter && (
         <Typewriter
           segments={getSegmentsForSentence(sentences[currentSentenceIndex])}
