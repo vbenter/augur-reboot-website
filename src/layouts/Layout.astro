@@ -1,5 +1,13 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
+import PerspectiveGridTunnel from "../components/PerspectiveGridTunnel.tsx";
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
 ---
 
 <!doctype html>
@@ -9,11 +17,50 @@ import "../styles/global.css";
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Augur | The Reboot</title>
+		<title>{title}</title>
 		<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100;400&display=swap" rel="stylesheet">
 	</head>
-	<body class="bg-background text-foreground font-barlow">
+	<body class="bg-background text-foreground">
+		<ClientRouter />
+		<PerspectiveGridTunnel 
+			client:load 
+			numLines={12} 
+			animationSpeed={0.1} 
+			maxOpacity={0.1} 
+			lineColor="#2AE7A8" 
+		/>
 		<slot />
 	</body>
+
+	<script>
+		import { animationActions } from '../stores/animationStore';
+
+		// Initialize animation store on first page load
+		function initializeAnimationStore() {
+			animationActions.initializeFromURL();
+		}
+
+		// Handle view transition lifecycle
+		function handleBeforeSwap() {
+			animationActions.startNavigation();
+		}
+
+		function handleAfterSwap() {
+			// Store will handle URL re-evaluation in components
+		}
+
+		function handlePageLoad() {
+			// Ensure store is properly initialized after navigation
+			animationActions.handleNavigation();
+		}
+
+		// Initialize on first load
+		initializeAnimationStore();
+
+		// Set up view transition event listeners
+		document.addEventListener('astro:before-swap', handleBeforeSwap);
+		document.addEventListener('astro:after-swap', handleAfterSwap);
+		document.addEventListener('astro:page-load', handlePageLoad);
+	</script>
 </html>

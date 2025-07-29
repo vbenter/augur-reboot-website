@@ -1,38 +1,60 @@
-
 import React, { useRef, useEffect, useState } from 'react';
+import { useStore } from '@nanostores/react';
+import { $isGridAnimating, animationActions, getAnimationState } from '../stores/animationStore';
 
 interface PerspectiveGridTunnelProps {
   numLines?: number;
   lineColor?: string;
   animationSpeed?: number;
-  animationStarted?: boolean;
   maxOpacity?: number;
 }
+
+// Create a stable component ID for view transitions
+const COMPONENT_ID = 'perspective-grid-tunnel';
 
 const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   numLines = 20,
   lineColor = '#00ff00',
   animationSpeed = 1,
-  animationStarted: initialAnimationStarted = false,
   maxOpacity = 1,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const frameCount = useRef(0);
   const [opacity, setOpacity] = useState(0);
-  const [animationStarted, setAnimationStarted] = useState(initialAnimationStarted);
+  
+  // Use nanostores for animation state instead of props/events
+  const isGridAnimating = useStore($isGridAnimating);
 
+  // Initialize animation based on current page context and restore frame state
   useEffect(() => {
-    const handleIntroFinished = () => {
-      setAnimationStarted(true);
-    };
-
-    document.addEventListener('introFinished', handleIntroFinished);
-
-    return () => {
-      document.removeEventListener('introFinished', handleIntroFinished);
-    };
+    // Restore frameCount from persistent store for animation continuity
+    const savedState = getAnimationState();
+    if (savedState.frameCount > 0) {
+      frameCount.current = savedState.frameCount;
+    }
+    
+    // For non-homepage (like /mission), start animation immediately
+    const isHomepage = typeof window !== 'undefined' && 
+      (window.location.pathname === '/' || window.location.pathname === '');
+    
+    if (!isHomepage) {
+      // Ensure animation starts for mission page visits
+      animationActions.startAnimations();
+    }
   }, []);
+
+  // Additional safety check: if we're on mission page but grid isn't animating, start it
+  useEffect(() => {
+    const isHomepage = typeof window !== 'undefined' && 
+      (window.location.pathname === '/' || window.location.pathname === '');
+    
+    if (!isHomepage && !isGridAnimating) {
+      // Safety fallback: ensure animation starts on non-homepage
+      console.log('Safety fallback: starting animations on mission page');
+      animationActions.startAnimations();
+    }
+  }, [isGridAnimating]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -160,14 +182,16 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
     };
 
     const animate = () => {
-      if (animationStarted) {
+      if (isGridAnimating) {
         frameCount.current++;
+        // Update store with current frame data for persistence
+        animationActions.updateGridFrame(frameCount.current, animationFrameId.current);
         draw();
       }
       animationFrameId.current = requestAnimationFrame(animate);
     };
 
-    if (animationStarted) {
+    if (isGridAnimating) {
       setOpacity(maxOpacity);
       animate();
     } else {
@@ -180,11 +204,13 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [numLines, lineColor, animationSpeed, animationStarted, maxOpacity]);
+  }, [numLines, lineColor, animationSpeed, isGridAnimating, maxOpacity]);
 
   return (
     <canvas
       ref={canvasRef}
+      id={COMPONENT_ID}
+      data-astro-transition-persist={COMPONENT_ID}
       style={{
         position: 'fixed',
         top: 0,
@@ -193,8 +219,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         height: '100%',
         zIndex: 0,
         opacity: opacity,
-        transition: 'opacity 2s ease-in',
-        background: 'black',
+        background: 'transparent',
       }}
     />
   );
