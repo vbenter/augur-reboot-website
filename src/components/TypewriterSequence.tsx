@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect } from 'react';
-import Typewriter from './Typewriter.tsx';
+import { useState, useEffect } from 'react';
+import Typewriter from './Typewriter';
 
 interface Segment {
   value: string;
@@ -64,7 +63,7 @@ const TypewriterSequence: React.FC<TypewriterSequenceProps> = ({
   }
 
   return (
-    <span className="uppercase text-green-500">
+    <span className="uppercase">
       {showTypewriter && (
         <Typewriter
           segments={getSegmentsForSentence(sentences[currentSentenceIndex])}

@@ -2,14 +2,16 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { $shouldShowIntro, animationActions } from '../stores/animationStore';
-import CrtDisplay from './CrtDisplay.tsx';
-import TypewriterSequence from './TypewriterSequence.tsx';
+import CrtDisplay from './CrtDisplay';
+import TypewriterSequence from './TypewriterSequence';
+import Button from './Button';
+import Pointer from './Pointer';
 
 const bootSentences: string[] = [
   "", // Start with a blank line for the "warm-up"
-  "BOOT SEQUENCE INITIATED",
+  "AUGUR BOOT SEQUENCE INITIATED",
   "PERFORMING SYSTEM CHECKS... UPDATE REQUIRED",
-  "SYSTEM REBOOT INITIATED"
+  "AUGUR REBOOT INITIATED"
 ];
 
 const Intro: React.FC = () => {
@@ -61,13 +63,16 @@ const Intro: React.FC = () => {
 
   return (
     <CrtDisplay isPoweredUp={isPoweredOn}>
-      <button
+      <Button
         onClick={handleSkipClick}
-        className="fixed top-8 right-10 z-50 font-display text-green-500/50 hover:text-foreground/100 focus:text-green-500/100 transition-colors duration-300 cursor-pointer"
+        variant="link"
+        size="lg"
+        className="fixed top-8 right-10 z-50 text-muted-foreground hover:no-underline"
       >
-        &gt; SKIP INTRO (ESC)
-      </button>
-      <div className="flex items-center justify-center h-screen font-display uppercase text-green-500">
+        <Pointer animated="auto" direction="right" />
+        SKIP INTRO (ESC)
+      </Button>
+      <div className="flex items-center justify-center h-screen uppercase text-foreground text-2xl">
         <TypewriterSequence
           sentences={bootSentences}
           defaultTypingSpeed={40}

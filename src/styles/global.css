@@ -114,6 +114,15 @@ html {
   }
 }
 
+@keyframes bounce-horizontal {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-8px);
+  }
+}
+
 .crt {
   background: linear-gradient(to top, #000000, #000000, #222222, #222222);
   background-size: cover;
@@ -142,9 +151,12 @@ html {
 
 .cursor {
   display: inline-block;
-  width: 0.5em;
   margin-left: 2px;
-  vertical-align: text-bottom;
+  vertical-align: baseline;
+
+  &:before {
+    content: "\258E"
+  }
 }
 
 .cursor.blink-active {
@@ -154,3 +166,28 @@ html {
 .cursor.hidden {
   visibility: hidden;
 }
+
+/* Ultra-simple pointer component */
+.pointer {
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: opacity 0.2s ease-in-out;
+
+  &.pointer-left::before { content: '<'; }
+  &.pointer-right::before { content: '>'; }
+
+  /* Auto pointers: animate on focus, stop on hover */
+  &.pointer-animated {
+    animation: bounce-horizontal 1s ease-in-out infinite; 
+
+    :hover > & {
+      animation: none;
+    }
+  }
+
+  /* Always animate */
+  &.pointer-animate-always { 
+    animation: bounce-horizontal 1s ease-in-out infinite; 
+  }
+}
+
