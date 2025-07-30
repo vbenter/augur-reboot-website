@@ -211,15 +211,8 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
       ref={canvasRef}
       id={COMPONENT_ID}
       data-astro-transition-persist={COMPONENT_ID}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        opacity: opacity,
-        background: 'transparent',
-      }}
+      className="fixed inset-0 w-screen h-screen bg-transparent -z-10"
+      style={{ opacity: maxOpacity }}
     />
   );
 };
