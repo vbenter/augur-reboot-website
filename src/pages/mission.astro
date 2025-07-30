@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 import MissionSection from "../components/MissionSection.astro";
 import Footer from "../components/Footer.astro";
+import Button from "../components/Button.astro";
 
 const missionSections = [
   {
@@ -10,14 +11,9 @@ const missionSections = [
     date: "March 31, 2025",
     details: [
       {
-        title: "",
+        title: "A NEW HOPE",
         description: "We officially announced the reboot of Augur under the guidance of the newly formed Lituus Foundation. Our immediate priorities included: Rebuilding infrastructure after years of project dormancy Restoring confidence in the REP token by acquiring a significant treasury stake Establishing clear direction for the oracle mechanism and community governance This marked the beginning of a deep research and development phase, focused on both game-theoretic soundness and practical usability."
-      },
-      {
-        title: "LAYER-2 NATIVE SETTLEMENT",
-        description:
-          "PRIMARY TRADE MATCHING AND SETTLEMENT MIGRATED TO OPTIMISTIC ROLLUP (E.G. BASE) FINALITY PROOFS BATCHED TO ETHEREUM L1 EVERY 4 HOURS",
-      },
+      }
     ],
   },
   {
@@ -25,15 +21,10 @@ const missionSections = [
     date: "May 12, 2025",
     details: [
       {
-        title: "A Cross-Chain Decentralized Truth Machine",
+        title: "A CROSS-CHAIN DECENTRALIZED TRUTH MACHINE",
         description:
           'After early architectural planning, we recognized a key opportunity: Augur’s oracle mechanism could be separated from prediction markets and offered as a standalone service. This vision became Generalized Augur — a universal, permissionless oracle protocol where: Any user or application can pay a fee to request the resolution of any well-specified question The outcome is settled using Augur’s upgraded fork-and-escalation resolution process Results can be posted to any EVM-compatible chain via bridging mechanisms This was a major conceptual expansion — from a niche oracle for a specific prediction market to a modular, cross-chain truth layer for Web3.',
-      },
-      {
-        title: "PROOF-OF-REALITY FEEDS",
-        description:
-          "INTRODUCES STANDARDIZED ON-CHAIN DATA ATTESTATIONS SIGNED BY REPUTABLE PUBLISHERS (APIS & NEWS DESKS) MARKETS CAN OPT-IN TO AUTOMATIC FINALIZATION IF QUORUM OF FEEDS AGREE",
-      },
+      }
     ],
   },
   {
@@ -44,37 +35,7 @@ const missionSections = [
         title: "Q1 AND BEYOND",
         description:
           'Three months into the reboot, we published our first comprehensive progress report. Key updates included: REP treasury growth: From ~250k to over 550k tokens under Foundation stewardship DEX liquidity provision: Over $100,000 deployed on Uniswap V3 to support token utility Community and ecosystem building: Participation in major crypto events, dev outreach, and Discord engagement R&D milestone: Paused implementation of a prototype (AugurCP) after discovering a critical game-theoretic vulnerability. We’re now conducting deeper oracle security research before proceeding.',
-      },
-      {
-        title: "QUADRATIC VOTING FOR PROPOSALS",
-        description:
-          "LIMITS WHALE DOMINANCE; STAKED REPX VOTES WEIGHTED BY SQUARE-ROOT FUNCTION",
-      },
-      {
-        title: "DYNAMIC INFLATION SCHEDULE",
-        description:
-          "1% BASE INFLATION ROUTED TO: 60% MARKET CREATION REWARD 30% ORACLE COUNCIL BUDGET 10% DEV DAO GRANTS",
-      },
-    ],
-  },
-  {
-    title: "Liquidity & Market Incentives",
-    date: "December 1, 2025",
-    details: [
-      {
-        title: "AMM-BACKED ORDER BOOKS",
-        description:
-          "UNFILLED ORDERS ROUTED TO AN INTERNAL CPMM POOL TO TIGHTEN SPREADS",
-      },
-      {
-        title: "LIQUIDITY MINING 2.0",
-        description: "EPOCH-BASED REWARDS THAT AUTO-COMPOUND INTO LP SHARES",
-      },
-      {
-        title: '"INSTANT RESOLVE" PREDICTION SWAPS',
-        description:
-          "CREATES OUTCOME-AGNOSTIC SYNTHETIC POSITIONS FOR RAPID HEDGING",
-      },
+      }
     ],
   },
 ];
@@ -85,26 +46,26 @@ const missionSections = [
     <!-- Top Section: Navigation -->
     <div class="flex justify-between items-start p-8">
       <!-- Back Button -->
-      <a id="back-button" href="/?intro=false" autofocus class="text-green-500 hover:fx-glow focus:fx-glow focus:outline-none text-2xl">
+      <Button id="back-button" variant="link" size="lg" href="/?intro=false" autofocus>
         &lt; BACK TO HOME
-      </a>
+      </Button>
       
       <!-- Social Links -->
       <SocialLinks />
     </div>
     
     <!-- Middle Section: Scrollable Content -->
-    <main class="overflow-y-auto px-4 md:px-8">
+    <main class="overflow-y-auto px-4 md:px-8 mb-12">
       <div class="max-w-screen-xl mx-auto">
-        <h1 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mt-16 mb-8">
+        <h1 class="flex justify-center items-center gap-3 text-primary text-2xl tracking-[4px] uppercase mt-16 mb-8">
           <span class="title-icon"></span>
-          Or Work On Augur
+          Our Work On Augur
         </h1>
 
         <div class="max-w-4xl mx-auto">
-          <p class="text-center mb-8">Augur has always represented a bold idea: a decentralized oracle system that lets anyone ask and resolve questions about the future — without trusted intermediaries. In 2025, the Lituus Foundation began rebooting Augur from the ground up, adapting its core ideas to a radically changed crypto landscape. Here's how our journey has unfolded so far:</p>
+          <p class="text-center text-muted-foreground mb-8 mx-auto max-w-2xl">Augur has always represented a bold idea: <span class="text-loud-foreground">A decentralized oracle system that lets anyone ask and resolve questions about the future — without trusted intermediaries</span>. In 2025, the Lituus Foundation began rebooting Augur from the ground up, adapting its core ideas to a radically changed crypto landscape. Here's how our journey has unfolded so far:</p>
 
-          <h2 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mb-12">
+          <h2 class="flex justify-center items-center gap-3 text-primary text-2xl tracking-[4px] uppercase mb-12">
             <span class="title-icon"></span>
             The Reboot Timeline
           </h2>
