@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Segment {
   value: string;
@@ -47,11 +46,9 @@ const Typewriter: React.FC<TypewriterProps> = ({ segments, defaultTypingSpeed = 
   }, [currentSegmentIndex, currentCharIndex, segments, defaultTypingSpeed, onComplete]);
 
   return (
-    <span className="typewriter-text font-display">
+    <span className="typewriter-text">
       {displayedText}
-      <span ref={cursorRef} className="cursor">
-        █
-      </span>
+      <span ref={cursorRef} className="cursor"></span>
     </span>
   );
 };
