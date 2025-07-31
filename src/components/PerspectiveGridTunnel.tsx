@@ -7,51 +7,359 @@ interface PerspectiveGridTunnelProps {
   lineColor?: string;
   animationSpeed?: number;
   maxOpacity?: number;
+  vanishingPoint?: number; // 0.0-1.0, defines where lines fade to transparent
 }
 
-// Create a stable component ID for view transitions
 const COMPONENT_ID = 'perspective-grid-tunnel';
+
+// WebGL shaders for high-performance rendering
+const VERTEX_SHADER = `
+attribute vec2 a_position;
+attribute float a_alpha;
+uniform vec2 u_resolution;
+uniform vec3 u_color;
+varying float v_alpha;
+
+void main() {
+  vec2 clipSpace = ((a_position / u_resolution) * 2.0) - 1.0;
+  gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+  v_alpha = a_alpha;
+}
+`;
+
+const FRAGMENT_SHADER = `
+precision mediump float;
+uniform vec3 u_color;
+varying float v_alpha;
+
+void main() {
+  gl_FragColor = vec4(u_color, v_alpha);
+}
+`;
+
+class WebGLGridRenderer {
+  private gl: WebGLRenderingContext;
+  private program: WebGLProgram | null = null;
+  private staticLinesBuffer: WebGLBuffer | null = null;
+  private gridBuffer: WebGLBuffer | null = null;
+  private staticVertices: Float32Array;
+  private gridVertices: Float32Array;
+  private numLines: number;
+  private lineColor: [number, number, number];
+  private vanishingPoint: number;
+
+  constructor(gl: WebGLRenderingContext, numLines: number, lineColor: string, vanishingPoint: number) {
+    this.gl = gl;
+    this.numLines = numLines;
+    this.lineColor = this.hexToRgb(lineColor);
+    this.vanishingPoint = vanishingPoint;
+    // Fix: Allocate for all 4 line types (top, bottom, left, right) with proper vertex count
+    // Each line = 2 vertices * 3 floats (x, y, alpha) = 6 floats per line
+    // 4 line types * (numLines + 1) lines * 6 floats = 24 * (numLines + 1)
+    this.staticVertices = new Float32Array((numLines + 1) * 4 * 6);
+    this.gridVertices = new Float32Array(15 * 24); // 15 segments * 4 lines per rect * 6 floats per line
+    
+    this.initializeWebGL();
+  }
+
+  private hexToRgb(hex: string): [number, number, number] {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+      parseInt(result[1], 16) / 255,
+      parseInt(result[2], 16) / 255,
+      parseInt(result[3], 16) / 255
+    ] : [0, 1, 0];
+  }
+
+  private createShader(type: number, source: string): WebGLShader | null {
+    const shader = this.gl.createShader(type);
+    if (!shader) return null;
+    
+    this.gl.shaderSource(shader, source);
+    this.gl.compileShader(shader);
+    
+    if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+      console.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
+      this.gl.deleteShader(shader);
+      return null;
+    }
+    
+    return shader;
+  }
+
+  private initializeWebGL() {
+    const vertexShader = this.createShader(this.gl.VERTEX_SHADER, VERTEX_SHADER);
+    const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, FRAGMENT_SHADER);
+    
+    if (!vertexShader || !fragmentShader) return;
+
+    this.program = this.gl.createProgram();
+    if (!this.program) return;
+
+    this.gl.attachShader(this.program, vertexShader);
+    this.gl.attachShader(this.program, fragmentShader);
+    this.gl.linkProgram(this.program);
+
+    if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
+      console.error('Program link error:', this.gl.getProgramInfoLog(this.program));
+      return;
+    }
+
+    // Create buffers
+    this.staticLinesBuffer = this.gl.createBuffer();
+    this.gridBuffer = this.gl.createBuffer();
+
+    // Enable blending for transparency
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+  }
+
+  resize(width: number, height: number) {
+    this.gl.viewport(0, 0, width, height);
+    this.precomputeStaticLines(width, height);
+  }
+
+  private precomputeStaticLines(width: number, height: number) {
+    const horizonWidth = width * 0.1;
+    const horizonHeight = height * 0.15;
+    const horizonX = (width - horizonWidth) / 2;
+    const horizonY = (height - horizonHeight) / 2;
+
+    let index = 0;
+    
+    // Pre-compute all static line vertices - now includes all 4 line types
+    for (let i = 0; i <= this.numLines; i++) {
+      const ratio = i / this.numLines;
+      
+      // Top lines: from top edge to vanishing point (NOT horizon)
+      const x1_top = ratio * width;
+      const y1_top = 0;
+      // Calculate vanishing point position: lerp between start and horizon by vanishingPoint percentage
+      const x2_top = x1_top + (horizonX + ratio * horizonWidth - x1_top) * this.vanishingPoint;
+      const y2_top = y1_top + (horizonY - y1_top) * this.vanishingPoint;
+      const alpha1_top = 1.0; // Full opacity at edge
+      const alpha2_top = 0.0; // Full transparency at vanishing point
+      
+      this.staticVertices[index++] = x1_top;
+      this.staticVertices[index++] = y1_top;
+      this.staticVertices[index++] = alpha1_top;
+      this.staticVertices[index++] = x2_top;
+      this.staticVertices[index++] = y2_top;
+      this.staticVertices[index++] = alpha2_top;
+
+      // Bottom lines: from bottom edge to vanishing point
+      const x1_bot = ratio * width;
+      const y1_bot = height;
+      const x2_bot = x1_bot + (horizonX + ratio * horizonWidth - x1_bot) * this.vanishingPoint;
+      const y2_bot = y1_bot + (horizonY + horizonHeight - y1_bot) * this.vanishingPoint;
+      const alpha1_bot = 1.0;
+      const alpha2_bot = 0.0; // Full transparency at vanishing point
+      
+      this.staticVertices[index++] = x1_bot;
+      this.staticVertices[index++] = y1_bot;
+      this.staticVertices[index++] = alpha1_bot;
+      this.staticVertices[index++] = x2_bot;
+      this.staticVertices[index++] = y2_bot;
+      this.staticVertices[index++] = alpha2_bot;
+
+      // Left lines: from left edge to vanishing point
+      const x1_left = 0;
+      const y1_left = ratio * height;
+      const x2_left = x1_left + (horizonX - x1_left) * this.vanishingPoint;
+      const y2_left = y1_left + (horizonY + ratio * horizonHeight - y1_left) * this.vanishingPoint;
+      const alpha1_left = 1.0;
+      const alpha2_left = 0.0; // Full transparency at vanishing point
+      
+      this.staticVertices[index++] = x1_left;
+      this.staticVertices[index++] = y1_left;
+      this.staticVertices[index++] = alpha1_left;
+      this.staticVertices[index++] = x2_left;
+      this.staticVertices[index++] = y2_left;
+      this.staticVertices[index++] = alpha2_left;
+
+      // Right lines: from right edge to vanishing point
+      const x1_right = width;
+      const y1_right = ratio * height;
+      const x2_right = x1_right + (horizonX + horizonWidth - x1_right) * this.vanishingPoint;
+      const y2_right = y1_right + (horizonY + ratio * horizonHeight - y1_right) * this.vanishingPoint;
+      const alpha1_right = 1.0;
+      const alpha2_right = 0.0; // Full transparency at vanishing point
+      
+      this.staticVertices[index++] = x1_right;
+      this.staticVertices[index++] = y1_right;
+      this.staticVertices[index++] = alpha1_right;
+      this.staticVertices[index++] = x2_right;
+      this.staticVertices[index++] = y2_right;
+      this.staticVertices[index++] = alpha2_right;
+    }
+
+    // Upload to GPU
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.staticLinesBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.staticVertices, this.gl.STATIC_DRAW);
+  }
+
+  render(frameCount: number, animationSpeed: number, width: number, height: number) {
+    if (!this.program) return;
+
+    // Set WebGL state for proper rendering
+    this.gl.clearColor(0, 0, 0, 0); // Transparent background
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    this.gl.useProgram(this.program);
+
+    // Set uniforms
+    const resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
+    const colorLocation = this.gl.getUniformLocation(this.program, 'u_color');
+    
+    this.gl.uniform2f(resolutionLocation, width, height);
+    this.gl.uniform3f(colorLocation, this.lineColor[0], this.lineColor[1], this.lineColor[2]);
+    
+
+    // Get attribute locations
+    const positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
+    const alphaLocation = this.gl.getAttribLocation(this.program, 'a_alpha');
+
+    // Render static lines
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.staticLinesBuffer);
+    this.gl.enableVertexAttribArray(positionLocation);
+    this.gl.enableVertexAttribArray(alphaLocation);
+    
+    // Fix: Each vertex has 3 floats (x, y, alpha), stride = 12 bytes
+    this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 12, 0);
+    this.gl.vertexAttribPointer(alphaLocation, 1, this.gl.FLOAT, false, 12, 8);
+    
+    // Fix: Each vertex is 3 floats, so vertex count = length / 3
+    this.gl.drawArrays(this.gl.LINES, 0, this.staticVertices.length / 3);
+
+    // Render animated grid
+    this.updateGridVertices(frameCount, animationSpeed, width, height);
+    
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.gridBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.gridVertices, this.gl.DYNAMIC_DRAW);
+    
+    // Fix: Grid vertices also have 3 floats per vertex (x, y, alpha)
+    this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 12, 0);
+    this.gl.vertexAttribPointer(alphaLocation, 1, this.gl.FLOAT, false, 12, 8);
+    
+    // Fix: Count only non-zero vertices to avoid rendering invalid data
+    let vertexCount = 0;
+    for (let i = 0; i < this.gridVertices.length; i += 3) {
+      if (this.gridVertices[i] !== 0 || this.gridVertices[i + 1] !== 0) {
+        vertexCount++;
+      }
+    }
+    this.gl.drawArrays(this.gl.LINES, 0, vertexCount);
+  }
+
+  private updateGridVertices(frameCount: number, animationSpeed: number, width: number, height: number) {
+    const horizonWidth = width * 0.1;
+    const horizonHeight = height * 0.15;
+    const zOffset = frameCount * animationSpeed;
+    const segmentLength = 40;
+    const totalSegments = 15;
+
+    // Clear the buffer first
+    this.gridVertices.fill(0);
+    let index = 0;
+
+    for (let i = 0; i < totalSegments; i++) {
+      const z = (i * segmentLength + zOffset) % (segmentLength * totalSegments);
+      const linearScale = z / (totalSegments * segmentLength);
+
+      if (linearScale > 1 || linearScale < 0) continue;
+
+      const scale = Math.pow(linearScale, 2.5);
+      const alpha = Math.pow(linearScale, 5);
+
+      // Adjust grid scaling to align with vanishing point
+      // At linearScale=0: grid should be at vanishing point size
+      // At linearScale=1: grid should be at full screen size
+      const vanishingWidth = width * 0.1 * this.vanishingPoint;
+      const vanishingHeight = height * 0.15 * this.vanishingPoint;
+      
+      const rectWidth = vanishingWidth + (width - vanishingWidth) * scale;
+      const rectHeight = vanishingHeight + (height - vanishingHeight) * scale;
+      const rectX = (width - rectWidth) / 2;
+      const rectY = (height - rectHeight) / 2;
+
+      // Create rectangle as 4 lines, each line = 2 vertices * 3 floats
+      // Top line
+      if (index + 5 < this.gridVertices.length) {
+        this.gridVertices[index++] = rectX; // x1
+        this.gridVertices[index++] = rectY; // y1
+        this.gridVertices[index++] = alpha; // alpha1
+        this.gridVertices[index++] = rectX + rectWidth; // x2
+        this.gridVertices[index++] = rectY; // y2
+        this.gridVertices[index++] = alpha; // alpha2
+      }
+
+      // Right line
+      if (index + 5 < this.gridVertices.length) {
+        this.gridVertices[index++] = rectX + rectWidth; // x1
+        this.gridVertices[index++] = rectY; // y1
+        this.gridVertices[index++] = alpha; // alpha1
+        this.gridVertices[index++] = rectX + rectWidth; // x2
+        this.gridVertices[index++] = rectY + rectHeight; // y2
+        this.gridVertices[index++] = alpha; // alpha2
+      }
+
+      // Bottom line
+      if (index + 5 < this.gridVertices.length) {
+        this.gridVertices[index++] = rectX + rectWidth; // x1
+        this.gridVertices[index++] = rectY + rectHeight; // y1
+        this.gridVertices[index++] = alpha; // alpha1
+        this.gridVertices[index++] = rectX; // x2
+        this.gridVertices[index++] = rectY + rectHeight; // y2
+        this.gridVertices[index++] = alpha; // alpha2
+      }
+
+      // Left line
+      if (index + 5 < this.gridVertices.length) {
+        this.gridVertices[index++] = rectX; // x1
+        this.gridVertices[index++] = rectY + rectHeight; // y1
+        this.gridVertices[index++] = alpha; // alpha1
+        this.gridVertices[index++] = rectX; // x2
+        this.gridVertices[index++] = rectY; // y2
+        this.gridVertices[index++] = alpha; // alpha2
+      }
+    }
+  }
+}
 
 const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   numLines = 20,
   lineColor = '#00ff00',
   animationSpeed = 1,
   maxOpacity = 1,
+  vanishingPoint = 0.75,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const frameCount = useRef(0);
   const [opacity, setOpacity] = useState(0);
+  const rendererRef = useRef<WebGLGridRenderer | null>(null);
+  const lastUpdateTime = useRef(0);
   
-  // Use nanostores for animation state instead of props/events
   const isGridAnimating = useStore($isGridAnimating);
 
-  // Initialize animation based on current page context and restore frame state
   useEffect(() => {
-    // Restore frameCount from persistent store for animation continuity
     const savedState = getAnimationState();
     if (savedState.frameCount > 0) {
       frameCount.current = savedState.frameCount;
     }
     
-    // For non-homepage (like /mission), start animation immediately
     const isHomepage = typeof window !== 'undefined' && 
       (window.location.pathname === '/' || window.location.pathname === '');
     
     if (!isHomepage) {
-      // Ensure animation starts for mission page visits
       animationActions.startAnimations();
     }
   }, []);
 
-  // Additional safety check: if we're on mission page but grid isn't animating, start it
   useEffect(() => {
     const isHomepage = typeof window !== 'undefined' && 
       (window.location.pathname === '/' || window.location.pathname === '');
     
     if (!isHomepage && !isGridAnimating) {
-      // Safety fallback: ensure animation starts on non-homepage
-      console.log('Safety fallback: starting animations on mission page');
       animationActions.startAnimations();
     }
   }, [isGridAnimating]);
@@ -59,134 +367,42 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) {
+      console.warn('WebGL not supported, falling back to 2D canvas');
+      return;
+    }
 
     let width: number, height: number;
 
     const resizeCanvas = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      
+      if (rendererRef.current) {
+        rendererRef.current.resize(width, height);
+      }
     };
 
+    // Initialize WebGL renderer
+    rendererRef.current = new WebGLGridRenderer(gl as WebGLRenderingContext, numLines, lineColor, vanishingPoint);
+    
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    const draw = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      // --- Style Setup ---
-      ctx.lineWidth = 1.5;
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = lineColor;
-
-      // --- Horizon Definition ---
-      const horizonWidth = width * 0.1;
-      const horizonHeight = height * 0.15;
-      const horizonX = (width - horizonWidth) / 2;
-      const horizonY = (height - horizonHeight) / 2;
-      const vanishingPoint = 0.75;
-
-      // --- 1. Draw STATIC Converging Lines with Gradient Opacity ---
-      const drawConvergingLines = () => {
-        for (let i = 0; i <= numLines; i++) {
-          const ratio = i / numLines;
-
-          // --- Gradient for Top lines ---
-          const x1_top = ratio * width;
-          const y1_top = 0;
-          const x2_top = horizonX + ratio * horizonWidth;
-          const y2_top = horizonY;
-
-          let gradient = ctx.createLinearGradient(x1_top, y1_top, x2_top, y2_top);
-          gradient.addColorStop(0, `${lineColor}ff`); // Opaque at the edge
-          gradient.addColorStop(vanishingPoint, `${lineColor}00`); // Transparent at the horizon
-          ctx.strokeStyle = gradient;
-          ctx.beginPath();
-          ctx.moveTo(x1_top, y1_top);
-          ctx.lineTo(x2_top, y2_top);
-          ctx.stroke();
-
-          // --- Gradient for Bottom lines ---
-          const y1_bot = height;
-          const y2_bot = horizonY + horizonHeight;
-          gradient = ctx.createLinearGradient(x1_top, y1_bot, x2_top, y2_bot);
-          gradient.addColorStop(0, `${lineColor}ff`);
-          gradient.addColorStop(vanishingPoint, `${lineColor}00`);
-          ctx.strokeStyle = gradient;
-          ctx.beginPath();
-          ctx.moveTo(x1_top, y1_bot);
-          ctx.lineTo(x2_top, y2_bot);
-          ctx.stroke();
-
-          // --- Gradient for Left lines ---
-          const x1_left = 0;
-          const y1_left = ratio * height;
-          const x2_left = horizonX;
-          const y2_left = horizonY + ratio * horizonHeight;
-          gradient = ctx.createLinearGradient(x1_left, y1_left, x2_left, y2_left);
-          gradient.addColorStop(0, `${lineColor}ff`);
-          gradient.addColorStop(vanishingPoint, `${lineColor}00`);
-          ctx.strokeStyle = gradient;
-          ctx.beginPath();
-          ctx.moveTo(x1_left, y1_left);
-          ctx.lineTo(x2_left, y2_left);
-          ctx.stroke();
-
-          // --- Gradient for Right lines ---
-          const x1_right = width;
-          const x2_right = horizonX + horizonWidth;
-          gradient = ctx.createLinearGradient(x1_right, y1_left, x2_right, y2_left);
-          gradient.addColorStop(0, `${lineColor}ff`);
-          gradient.addColorStop(vanishingPoint, `${lineColor}00`);
-          ctx.strokeStyle = gradient;
-          ctx.beginPath();
-          ctx.moveTo(x1_right, y1_left);
-          ctx.lineTo(x2_right, y2_left);
-          ctx.stroke();
-        }
-      };
-
-      // --- 2. Draw ANIMATED Grid Squares (Center to Edge) ---
-      const drawAnimatedGrid = () => {
-        const zOffset = frameCount.current * animationSpeed;
-        const segmentLength = 40;
-        const totalSegments = 15;
-
-        for (let i = 0; i < totalSegments; i++) {
-          const z = (i * segmentLength + zOffset) % (segmentLength * totalSegments);
-          const linearScale = z / (totalSegments * segmentLength);
-
-          if (linearScale > 1 || linearScale < 0) continue;
-
-          // Use an exponential scale for a more realistic perspective effect
-          const scale = Math.pow(linearScale, 2.5);
-
-          const rectWidth = horizonWidth + (width - horizonWidth) * scale;
-          const rectHeight = horizonHeight + (height - horizonHeight) * scale;
-          const rectX = (width - rectWidth) / 2;
-          const rectY = (height - rectHeight) / 2;
-
-          // Opacity is 0 at the center and fades in towards the edge.
-          const alpha = Math.pow(linearScale, 5);
-          ctx.strokeStyle = `${lineColor}${Math.floor(alpha * 255)
-            .toString(16)
-            .padStart(2, '0')}`;
-
-          ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
-        }
-      };
-
-      drawAnimatedGrid();
-      drawConvergingLines();
-    };
-
     const animate = () => {
-      if (isGridAnimating) {
+      if (isGridAnimating && rendererRef.current) {
         frameCount.current++;
-        // Update store with current frame data for persistence
-        animationActions.updateGridFrame(frameCount.current, animationFrameId.current);
-        draw();
+        
+        // Throttle store updates
+        const now = Date.now();
+        if (now - lastUpdateTime.current > 1000) {
+          animationActions.updateGridFrame(frameCount.current, animationFrameId.current);
+          lastUpdateTime.current = now;
+        }
+        
+        rendererRef.current.render(frameCount.current, animationSpeed, width, height);
       }
       animationFrameId.current = requestAnimationFrame(animate);
     };
@@ -204,7 +420,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [numLines, lineColor, animationSpeed, isGridAnimating, maxOpacity]);
+  }, [numLines, lineColor, animationSpeed, isGridAnimating, maxOpacity, vanishingPoint]);
 
   return (
     <canvas
@@ -212,7 +428,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
       id={COMPONENT_ID}
       data-astro-transition-persist={COMPONENT_ID}
       className="fixed inset-0 w-screen h-screen bg-transparent -z-10"
-      style={{ opacity: maxOpacity }}
+      style={{ opacity: opacity }}
     />
   );
 };
