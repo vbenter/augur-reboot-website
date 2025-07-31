@@ -1,64 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import SocialLinks from "../components/SocialLinks.astro";
-import MissionSection from "../components/MissionSection.astro";
+import TeamCard from "../components/TeamCard.astro";
 import Footer from "../components/Footer.astro";
 import Button from "../components/Button.astro";
-
-const teamSections = [
-  {
-    title: "The Lituus Foundation",
-    date: "Stewardship & Strategy",
-    details: [
-      {
-        title: "TREASURY & GOVERNANCE",
-        description: "The Lituus Foundation is the steward of Augur's revival. It holds and deploys treasury funds to support independent teams working toward the project's success. To encourage innovation, redundancy, and diverse problem-solving strategies, the Foundation has funded two parallel teams working on different approaches to the same core challenges."
-      }
-    ],
-  },
-  {
-    title: "Two Teams, One Mission",
-    date: "Parallel Development Approach",
-    details: [
-      {
-        title: "LITUUS LABS",
-        description: "Focused on oracle architecture, cryptoeconomic security, and protocol design. Their current work centers on a generalized, finalizing oracle that provides definitive resolution to questions through Augur's upgraded fork-and-escalation mechanism."
-      },
-      {
-        title: "DARK FLORIST", 
-        description: "Focused on alternative oracle structures, user-facing applications, and incentive models. Their approach emphasizes a non-finalizing oracle design that explores different mechanisms for achieving decentralized truth resolution."
-      }
-    ],
-  },
-  {
-    title: "Our Development Philosophy",
-    date: "Innovation Through Redundancy",
-    details: [
-      {
-        title: "DIVERSE PROBLEM-SOLVING",
-        description: "Each team brings its own perspective to solving the core challenges of decentralized truth, and both contribute directly to Augur's evolving roadmap. This dual-team model ensures that ideas are rigorously explored from multiple angles — accelerating progress, increasing resilience, and reducing single-point failure risk."
-      }
-    ],
-  },
-  {
-    title: "Where We're Headed",
-    date: "Next Milestones",
-    details: [
-      {
-        title: "FINALIZING ORACLE ARCHITECTURE",
-        description: "Completing the new oracle architecture with academic-style documentation and formal reasoning to ensure cryptoeconomic security and game-theoretic soundness."
-      },
-      {
-        title: "EXPANDING REP ACCESSIBILITY",
-        description: "Making REP token accessible across more exchanges and Layer 2 solutions to increase utility and reduce friction for users and applications."
-      },
-      {
-        title: "RELAUNCHING MARKET PROTOCOL",
-        description: "Launching an Augur-native market protocol once oracle security and fee-routing mechanisms are finalized, bringing prediction markets back to the ecosystem."
-      }
-    ],
-  },
-];
 ---
 
 <Layout title="Team - Augur">
@@ -75,44 +20,65 @@ const teamSections = [
     </div>
     
     <!-- Middle Section: Scrollable Content -->
-    <main class="overflow-y-auto px-4 md:px-8 mb-12">
+    <main class="overflow-y-auto px-4 md:px-8 mb-12 uppercase">
       <div class="max-w-screen-xl mx-auto">
-        <h1 class="flex justify-center items-center gap-3 text-primary text-2xl tracking-[4px] uppercase mt-16 mb-8">
-          <span class="title-icon"></span>
-          The Minds Behind The Reboot
+        <h1 class="flex justify-center items-center gap-3 text-loud-foreground text-2xl tracking-[4px] uppercase mt-16 mb-8">
+          &gt; The Minds Behind The Reboot &lt;
         </h1>
 
         <div class="max-w-4xl mx-auto">
-          <p class="text-center text-muted-foreground mb-4 mx-auto max-w-2xl">The Lituus Foundation stewards Augur's revival through <span class="text-loud-foreground">strategic funding of independent teams</span> working in parallel to solve decentralized truth challenges.</p>
+          <p class="text-center text-muted-foreground mb-4 mx-auto max-w-2xl"><span class="text-loud-foreground">The Lituus Foundation</span> is the steward of Augur's revival. It holds and deploys treasury funds to support independent teams working toward the project's success.</p>
+          
+          <p class="text-center text-muted-foreground mb-8 mx-auto max-w-2xl">To encourage innovation, redundancy, and diverse problem-solving strategies, the Foundation has funded two parallel teams:</p>
           
           <div class="text-center mb-12">
-            <blockquote class="text-xl font-bold text-primary italic">
-              "Two teams, two approaches. One mission: revive Augur."
+            <blockquote class="text-3xl font-bold text-loud-foreground">
+              Two teams, two approaches. One mission: revive Augur.
             </blockquote>
           </div>
 
-          <h2 class="flex justify-center items-center gap-3 text-primary text-2xl tracking-[4px] uppercase mb-12">
+          <!-- Side-by-side Team Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-16">
+            <TeamCard 
+              name="Lituus Labs" 
+              description="Focused on oracle architecture, cryptoeconomic security, and protocol design. Their current work centers on a generalized, finalizing oracle."
+            />
+            <TeamCard 
+              name="Dark Florist" 
+              description="Focused on alternative oracle structures, user-facing applications, and incentive models. Their approach emphasizes a non-finalizing oracle design."
+            />
+          </div>
+
+          <p class="text-center text-muted-foreground mb-12 mx-auto max-w-2xl">
+            Each team brings its own perspective to solving the core challenges of decentralized truth, and both contribute directly to Augur's evolving roadmap. This dual-team model ensures that ideas are rigorously explored from multiple angles — <span class="text-loud-foreground">accelerating progress, increasing resilience, and reducing single-point failure risk</span>.
+          </p>
+
+          <h2 class="flex justify-center items-center gap-3 text-loud-foreground text-2xl tracking-[4px] uppercase mb-8">
             <span class="title-icon"></span>
-            Foundation & Teams
+            Where We're Headed
           </h2>
 
-          {
-            teamSections.map((section, index) => (
-              <MissionSection
-                title={section.title}
-                date={section.date}
-                details={section.details}
-                isLast={index === teamSections.length - 1}
-              />
-            ))
-          }
-
-          <div class="mt-16 p-6 border border-primary/20 bg-primary/5 rounded-lg">
-            <p class="text-center text-muted-foreground">
-              We see Augur not just as a product, but as an evolving open infrastructure project — 
-              <span class="text-loud-foreground">a decentralized public good that anyone can contribute to or build on</span>.
-            </p>
+          <div class="space-y-8 mb-12 max-w-2xl mx-auto">
+            <div class="text-center">
+              <h3 class="text-loud-foreground font-bold tracking-[1px] uppercase">Finalizing the new oracle architecture</h3>
+              <p class="text-muted-foreground">with academic-style documentation and formal reasoning</p>
+            </div>
+            
+            <div class="text-center">
+              <h3 class="text-loud-foreground font-bold tracking-[1px] uppercase">Expanding REP token accessibility</h3>
+              <p class="text-muted-foreground">across more exchanges and L2s</p>
+            </div>
+            
+            <div class="text-center">
+              <h3 class="text-loud-foreground font-bold  uppercase">Relaunching an Augur-native market protocol</h3>
+              <p class="text-muted-foreground">once oracle security and fee-routing mechanisms are finalized</p>
+            </div>
           </div>
+
+          <p class="text-center text-muted-foreground mt-16 mx-auto max-w-2xl">
+            We see Augur not just as a product, but as an evolving open infrastructure project — 
+            <span class="text-loud-foreground">a decentralized public good that anyone can contribute to or build on</span>.
+          </p>
         </div>
       </div>
     </main>

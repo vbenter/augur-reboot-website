@@ -1,0 +1,34 @@
+---
+interface Props {
+  name: string;
+  description: string;
+  logoPlaceholder?: boolean;
+}
+
+const { name, description, logoPlaceholder = true } = Astro.props;
+---
+
+<div class="team-card border border-foreground/20 bg-background/70 p-6">
+  {logoPlaceholder && (
+    <div class="logo-placeholder mb-4">
+    <div class="w-16 h-16 border-2 border-dashed border-muted-foreground/30 flex items-center justify-center text-primary/50 text-xs">
+        LOGO
+      </div>
+    </div>
+  )}
+  
+  <h3 class="text-xl font-bold text-loud-foreground tracking-[0.125em] uppercase">
+    {name}
+  </h3>
+  
+  <p class="text-muted-foreground">
+    {description}
+  </p>
+</div>
+
+<style>
+  .logo-placeholder {
+    display: flex;
+    justify-content: flex-start;
+  }
+</style>
