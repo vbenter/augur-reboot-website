@@ -3,7 +3,10 @@ import Layout from "../layouts/Layout.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 import TeamCard from "../components/TeamCard.astro";
 import Footer from "../components/Footer.astro";
-import Button from "../components/Button.astro";
+import Button from "../components/Button.tsx";
+import Pointer from "../components/Pointer.tsx";
+import PageHeading from "../components/PageHeading.astro";
+import SectionHeading from "../components/SectionHeading.astro";
 ---
 
 <Layout title="Team - Augur">
@@ -12,7 +15,8 @@ import Button from "../components/Button.astro";
     <div class="flex justify-between items-start p-8">
       <!-- Back Button -->
       <Button id="back-button" variant="link" size="lg" href="/?intro=false" autofocus>
-        &lt; BACK TO HOME
+        <Pointer animated="auto" direction="left" />
+        BACK TO HOME
       </Button>
       
       <!-- Social Links -->
@@ -22,9 +26,7 @@ import Button from "../components/Button.astro";
     <!-- Middle Section: Scrollable Content -->
     <main class="overflow-y-auto px-4 md:px-8 mb-12 uppercase">
       <div class="max-w-screen-xl mx-auto">
-        <h1 class="flex justify-center items-center gap-3 text-loud-foreground text-2xl tracking-[4px] uppercase mt-16 mb-8">
-          &gt; The Minds Behind The Reboot &lt;
-        </h1>
+        <PageHeading text="The Minds Behind The Reboot" />
 
         <div class="max-w-4xl mx-auto">
           <p class="text-center text-muted-foreground mb-4 mx-auto max-w-2xl"><span class="text-loud-foreground">The Lituus Foundation</span> is the steward of Augur's revival. It holds and deploys treasury funds to support independent teams working toward the project's success.</p>
@@ -53,10 +55,7 @@ import Button from "../components/Button.astro";
             Each team brings its own perspective to solving the core challenges of decentralized truth, and both contribute directly to Augur's evolving roadmap. This dual-team model ensures that ideas are rigorously explored from multiple angles — <span class="text-loud-foreground">accelerating progress, increasing resilience, and reducing single-point failure risk</span>.
           </p>
 
-          <h2 class="flex justify-center items-center gap-3 text-loud-foreground text-2xl tracking-[4px] uppercase mb-8">
-            <span class="title-icon"></span>
-            Where We're Headed
-          </h2>
+          <SectionHeading text="Where We're Headed" />
 
           <div class="space-y-8 mb-12 max-w-2xl mx-auto">
             <div class="text-center">
@@ -87,17 +86,3 @@ import Button from "../components/Button.astro";
     <Footer />
   </div>
 </Layout>
-
-<style>
-  /* The icon used in the main titles */
-  .title-icon {
-    display: block;
-    width: 20px;
-    height: 20px;
-    background-color: #00ff9b;
-    -webkit-mask: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0H7V7H0V0Z' fill='black'/%3E%3Cpath d='M0 13H7V20H0V13Z' fill='black'/%3E%3Cpath d='M13 0H20V7H13V0Z' fill='black'/%3E%3Cpath d='M13 13H20V20H13V13Z' fill='black'/%3E%3C/svg%3E%0A")
-      no-repeat center;
-    mask: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0H7V7H0V0Z' fill='black'/%3E%3Cpath d='M0 13H7V20H0V13Z' fill='black'/%3E%3Cpath d='M13 0H20V7H13V0Z' fill='black'/%3E%3Cpath d='M13 13H20V20H13V13Z' fill='black'/%3E%3C/svg%3E%0A")
-      no-repeat center;
-  }
-</style>
