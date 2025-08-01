@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import ForkMeterUI, { type ForkMeterMetadata, ForkMeterState } from './ForkMeterUI.tsx';
-import { $animationStore, AnimationPhase } from '../stores/animationStore';
+import { $appStore, UIState } from '../stores/animationStore';
 
 interface ForkMeterProps {
   value?: number; // 0-100 for pointer position
@@ -17,14 +17,13 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
   
   // Subscribe to animation state
   useEffect(() => {
-    const unsubscribe = $animationStore.subscribe((state) => {
-      const shouldShow = state.phase === AnimationPhase.ANIMATIONS_ACTIVE || 
-                        state.phase === AnimationPhase.INTRO_SKIPPED;
-      
+    const unsubscribe = $appStore.subscribe((state) => {
+      const shouldShow = state.uiState === UIState.MAIN_CONTENT;
       setIsVisible(shouldShow);
       
-      // If intro was skipped, disable gauge animation for immediate display
-      if (state.phase === AnimationPhase.INTRO_SKIPPED) {
+      // Check if intro was skipped by looking at URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('intro') === 'false') {
         setShouldAnimate(false);
       } else {
         setShouldAnimate(animated);
@@ -32,12 +31,12 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
     });
 
     // Initialize with current state
-    const currentState = $animationStore.get();
-    const shouldShow = currentState.phase === AnimationPhase.ANIMATIONS_ACTIVE || 
-                      currentState.phase === AnimationPhase.INTRO_SKIPPED;
+    const currentState = $appStore.get();
+    const shouldShow = currentState.uiState === UIState.MAIN_CONTENT;
     setIsVisible(shouldShow);
     
-    if (currentState.phase === AnimationPhase.INTRO_SKIPPED) {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('intro') === 'false') {
       setShouldAnimate(false);
     }
 

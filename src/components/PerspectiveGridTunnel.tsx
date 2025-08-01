@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { $isGridAnimating, animationActions, getAnimationState } from '../stores/animationStore';
+import { $appStore, UIState, appActions } from '../stores/animationStore';
 
 interface PerspectiveGridTunnelProps {
   numLines?: number;
@@ -339,19 +339,21 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   const rendererRef = useRef<WebGLGridRenderer | null>(null);
   const lastUpdateTime = useRef(0);
   
-  const isGridAnimating = useStore($isGridAnimating);
+  const appState = useStore($appStore);
+  const isGridAnimating = appState.uiState === UIState.MAIN_CONTENT;
 
   useEffect(() => {
-    const savedState = getAnimationState();
-    if (savedState.frameCount > 0) {
-      frameCount.current = savedState.frameCount;
+    // Restore saved frame count if available
+    if (appState.gridFrameCount > 0) {
+      frameCount.current = appState.gridFrameCount;
     }
     
     const isHomepage = typeof window !== 'undefined' && 
       (window.location.pathname === '/' || window.location.pathname === '');
     
-    if (!isHomepage) {
-      animationActions.startAnimations();
+    // For non-homepage visits, ensure we're in main content state
+    if (!isHomepage && appState.uiState === UIState.BOOT_SEQUENCE) {
+      appActions.skipToMainContent();
     }
   }, []);
 
@@ -359,10 +361,11 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
     const isHomepage = typeof window !== 'undefined' && 
       (window.location.pathname === '/' || window.location.pathname === '');
     
-    if (!isHomepage && !isGridAnimating) {
-      animationActions.startAnimations();
+    // For non-homepage visits, ensure we're in main content state
+    if (!isHomepage && appState.uiState === UIState.BOOT_SEQUENCE) {
+      appActions.skipToMainContent();
     }
-  }, [isGridAnimating]);
+  }, [appState.uiState]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -398,7 +401,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         // Throttle store updates
         const now = Date.now();
         if (now - lastUpdateTime.current > 1000) {
-          animationActions.updateGridFrame(frameCount.current, animationFrameId.current);
+          appActions.updateGridFrame(frameCount.current, animationFrameId.current);
           lastUpdateTime.current = now;
         }
         

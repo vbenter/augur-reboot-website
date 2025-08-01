@@ -35,33 +35,22 @@ const { title } = Astro.props;
 	</body>
 
 	<script>
-		import { animationActions } from '../stores/animationStore';
+		import { appActions } from '../stores/animationStore';
 
-		// Initialize animation store on first page load
-		function initializeAnimationStore() {
-			animationActions.initializeFromURL();
-		}
-
-		// Handle view transition lifecycle
-		function handleBeforeSwap() {
-			animationActions.startNavigation();
-		}
-
-		function handleAfterSwap() {
-			// Store will handle URL re-evaluation in components
+		// Initialize app store on first page load
+		function initializeAppStore() {
+			appActions.initializeFromURL();
 		}
 
 		function handlePageLoad() {
 			// Ensure store is properly initialized after navigation
-			animationActions.handleNavigation();
+			appActions.handleNavigation();
 		}
 
 		// Initialize on first load
-		initializeAnimationStore();
+		initializeAppStore();
 
 		// Set up view transition event listeners
-		document.addEventListener('astro:before-swap', handleBeforeSwap);
-		document.addEventListener('astro:after-swap', handleAfterSwap);
 		document.addEventListener('astro:page-load', handlePageLoad);
 	</script>
 </html>

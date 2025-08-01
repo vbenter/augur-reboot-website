@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { $shouldShowIntro, animationActions } from '../stores/animationStore';
+import { $appStore, UIState, appActions } from '../stores/animationStore';
 import CrtDisplay from './CrtDisplay';
 import TypewriterSequence from './TypewriterSequence';
 import Button from './Button';
@@ -15,8 +15,7 @@ const bootSentences: string[] = [
 ];
 
 const Intro: React.FC = () => {
-  // Use nanostores to determine visibility instead of local state
-  const shouldShowIntro = useStore($shouldShowIntro);
+  const appState = useStore($appStore);
   const [isPoweredOn, setIsPoweredOn] = useState(true);
 
   const handleSequenceComplete = () => {
@@ -25,28 +24,20 @@ const Intro: React.FC = () => {
       setTimeout(() => {
         setIsPoweredOn(true);
         setTimeout(() => {
-          // Use store action instead of local state
-          animationActions.startAnimations();
+          appActions.completeBootSequence();
         }, 500);
       }, 200);
     }, 1000);
   };
 
   const handleSkipClick = () => {
-    const params = new URLSearchParams(window.location.search);
-    params.set('intro', 'false');
-    window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
-    // Use store action instead of local state and events
-    animationActions.skipAnimations();
+    appActions.skipToMainContent();
   };
-
-  // Remove the old URL parameter checking - now handled by the store
-  // Remove the old event dispatching - now handled by store actions
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        handleSkipClick(); // Use the same skip logic as clicking skip button
+        handleSkipClick();
       }
     };
 
@@ -57,7 +48,8 @@ const Intro: React.FC = () => {
     };
   }, []);
 
-  if (!shouldShowIntro) {
+  // Only render when in boot sequence state
+  if (appState.uiState !== UIState.BOOT_SEQUENCE) {
     return null;
   }
 
