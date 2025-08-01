@@ -1,6 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { useStore } from '@nanostores/react';
-import { $isGridAnimating, animationActions, getAnimationState } from '../stores/animationStore';
+import React, { useRef, useEffect } from 'react';
 
 interface PerspectiveGridTunnelProps {
   numLines?: number;
@@ -10,7 +8,6 @@ interface PerspectiveGridTunnelProps {
   vanishingPoint?: number; // 0.0-1.0, defines where lines fade to transparent
 }
 
-const COMPONENT_ID = 'perspective-grid-tunnel';
 
 // WebGL shaders for high-performance rendering
 const VERTEX_SHADER = `
@@ -47,6 +44,7 @@ class WebGLGridRenderer {
   private numLines: number;
   private lineColor: [number, number, number];
   private vanishingPoint: number;
+  private isDisposed: boolean = false;
 
   constructor(gl: WebGLRenderingContext, numLines: number, lineColor: string, vanishingPoint: number) {
     this.gl = gl;
@@ -199,7 +197,7 @@ class WebGLGridRenderer {
   }
 
   render(frameCount: number, animationSpeed: number, width: number, height: number) {
-    if (!this.program) return;
+    if (!this.program || this.isDisposed) return;
 
     // Set WebGL state for proper rendering
     this.gl.clearColor(0, 0, 0, 0); // Transparent background
@@ -323,6 +321,29 @@ class WebGLGridRenderer {
       }
     }
   }
+
+  dispose() {
+    if (this.isDisposed) return;
+    
+    // Delete WebGL buffers
+    if (this.staticLinesBuffer) {
+      this.gl.deleteBuffer(this.staticLinesBuffer);
+      this.staticLinesBuffer = null;
+    }
+    
+    if (this.gridBuffer) {
+      this.gl.deleteBuffer(this.gridBuffer);
+      this.gridBuffer = null;
+    }
+    
+    // Delete shader program
+    if (this.program) {
+      this.gl.deleteProgram(this.program);
+      this.program = null;
+    }
+    
+    this.isDisposed = true;
+  }
 }
 
 const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
@@ -335,34 +356,10 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const frameCount = useRef(0);
-  const [opacity, setOpacity] = useState(0);
   const rendererRef = useRef<WebGLGridRenderer | null>(null);
-  const lastUpdateTime = useRef(0);
   
-  const isGridAnimating = useStore($isGridAnimating);
+  const opacity = maxOpacity;
 
-  useEffect(() => {
-    const savedState = getAnimationState();
-    if (savedState.frameCount > 0) {
-      frameCount.current = savedState.frameCount;
-    }
-    
-    const isHomepage = typeof window !== 'undefined' && 
-      (window.location.pathname === '/' || window.location.pathname === '');
-    
-    if (!isHomepage) {
-      animationActions.startAnimations();
-    }
-  }, []);
-
-  useEffect(() => {
-    const isHomepage = typeof window !== 'undefined' && 
-      (window.location.pathname === '/' || window.location.pathname === '');
-    
-    if (!isHomepage && !isGridAnimating) {
-      animationActions.startAnimations();
-    }
-  }, [isGridAnimating]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -392,41 +389,31 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
     resizeCanvas();
 
     const animate = () => {
-      if (isGridAnimating && rendererRef.current) {
+      if (rendererRef.current) {
         frameCount.current++;
-        
-        // Throttle store updates
-        const now = Date.now();
-        if (now - lastUpdateTime.current > 1000) {
-          animationActions.updateGridFrame(frameCount.current, animationFrameId.current);
-          lastUpdateTime.current = now;
-        }
-        
         rendererRef.current.render(frameCount.current, animationSpeed, width, height);
       }
       animationFrameId.current = requestAnimationFrame(animate);
     };
 
-    if (isGridAnimating) {
-      setOpacity(maxOpacity);
-      animate();
-    } else {
-      setOpacity(0);
-    }
+    // Always animate - this is just a background animation
+    animate();
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
+      if (rendererRef.current) {
+        rendererRef.current.dispose();
+        rendererRef.current = null;
+      }
     };
-  }, [numLines, lineColor, animationSpeed, isGridAnimating, maxOpacity, vanishingPoint]);
+  }, [numLines, lineColor, animationSpeed, maxOpacity, vanishingPoint]);
 
   return (
     <canvas
       ref={canvasRef}
-      id={COMPONENT_ID}
-      data-astro-transition-persist={COMPONENT_ID}
       className="fixed inset-0 w-screen h-screen bg-transparent -z-10"
       style={{ opacity: opacity }}
     />

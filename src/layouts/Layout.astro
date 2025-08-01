@@ -20,11 +20,14 @@ const { title } = Astro.props;
 		<title>{title}</title>
 		<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css2?family=Handjet:wght@300;400&display=swap" rel="stylesheet">
+		<ClientRouter />
 	</head>
 	<body>
-		<ClientRouter />
 		<PerspectiveGridTunnel 
 			client:load 
+			transition:persist
+			transition:persist-props
+			transition:name="grid-tunnel"
 			numLines={12} 
 			animationSpeed={0.1} 
 			maxOpacity={0.2} 
@@ -35,33 +38,22 @@ const { title } = Astro.props;
 	</body>
 
 	<script>
-		import { animationActions } from '../stores/animationStore';
+		import { appActions } from '../stores/animationStore';
 
-		// Initialize animation store on first page load
-		function initializeAnimationStore() {
-			animationActions.initializeFromURL();
-		}
-
-		// Handle view transition lifecycle
-		function handleBeforeSwap() {
-			animationActions.startNavigation();
-		}
-
-		function handleAfterSwap() {
-			// Store will handle URL re-evaluation in components
+		// Initialize app store on first page load
+		function initializeAppStore() {
+			appActions.initializeFromURL();
 		}
 
 		function handlePageLoad() {
 			// Ensure store is properly initialized after navigation
-			animationActions.handleNavigation();
+			appActions.handleNavigation();
 		}
 
 		// Initialize on first load
-		initializeAnimationStore();
+		initializeAppStore();
 
 		// Set up view transition event listeners
-		document.addEventListener('astro:before-swap', handleBeforeSwap);
-		document.addEventListener('astro:after-swap', handleAfterSwap);
 		document.addEventListener('astro:page-load', handlePageLoad);
 	</script>
 </html>

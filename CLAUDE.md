@@ -19,6 +19,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **MUST** use agile-project-orchestrator for complex implementations requiring multiple specialists
 **ALWAYS** break complex features into parallel workstreams, delegate to specialized agents, avoid single-agent bottlenecks
 
+## Architectural Principles
+**NEVER** add state management logic to rendering components - state belongs in stores
+**ALWAYS** make rendering components purely reactive to state - no URL detection or navigation logic
+**NEVER** add "safety fallbacks" or "defensive code" that violates separation of concerns
+**ALWAYS** handle page initialization logic in store initialization, not component effects
+
+## WebGL & Resource Management
+**ALWAYS** implement proper dispose() methods for WebGL resources (buffers, programs, shaders)
+**MUST** call dispose() in React component cleanup effects to prevent GPU memory leaks
+**NEVER** render after disposal - add isDisposed guards in render methods
+
 # CURRENT PROJECT STATE
 
 ## Active Configuration

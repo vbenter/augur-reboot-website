@@ -33,7 +33,7 @@ import SocialLinks from './SocialLinks.astro';
 
       <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
         <a id="first-menu-item" href="/mission" class="text-2xl font-bold text-foreground py-1 block hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none">
-          A FUTURE THOUGHTFULLY BEING BUILT 
+          THE NEXT GENERATION OF ORACLES
         </a>
         <a href="/team" class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground py-1 block hover:fx-glow focus:fx-glow focus:outline-none ">
           THE MINDS BEHIND THE REBOOT
@@ -218,14 +218,14 @@ import SocialLinks from './SocialLinks.astro';
 </style>
 
 <script>
-  import { $animationStore, $shouldSkipAnimations, AnimationPhase, animationActions } from '../stores/animationStore';
+  import { $appStore, UIState, appActions } from '../stores/animationStore';
 
   // DOM element references
   let heroBanner: HTMLElement | null = null;
   let firstMenuItem: HTMLAnchorElement | null = null;
   let unsubscribe: (() => void) | null = null;
   let isInitialized = false;
-  let lastAppliedPhase: AnimationPhase | null = null;
+  let lastAppliedState: UIState | null = null;
   let focusTimeout: number | null = null;
 
   function initializeElements() {
@@ -233,16 +233,15 @@ import SocialLinks from './SocialLinks.astro';
     firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement;
   }
 
-  function updateHeroBanner(state: typeof $animationStore.value) {
+  function updateHeroBanner(state: typeof $appStore.value) {
     if (!heroBanner) return;
     
-    // Prevent redundant updates - only update if phase actually changed
-    if (lastAppliedPhase === state.phase) {
+    // Prevent redundant updates - only update if state actually changed
+    if (lastAppliedState === state.uiState) {
       return;
     }
 
-    console.log('HeroBanner: Updating from', lastAppliedPhase, 'to', state.phase);
-    lastAppliedPhase = state.phase;
+    lastAppliedState = state.uiState;
 
     // Clear any pending focus timeout
     if (focusTimeout) {
@@ -253,25 +252,26 @@ import SocialLinks from './SocialLinks.astro';
     // Clear all animation classes
     heroBanner.classList.remove('animations-started', 'animations-skipped');
 
-    // Apply appropriate class based on current phase
-    switch (state.phase) {
-      case AnimationPhase.INTRO_SKIPPED:
-        heroBanner.classList.add('animations-skipped');
-        firstMenuItem?.focus();
-        break;
-      
-      case AnimationPhase.ANIMATIONS_ACTIVE:
-        heroBanner.classList.add('animations-started');
-        // Focus after animations complete (8.3s total)
-        focusTimeout = setTimeout(() => {
+    // Apply appropriate class based on current UI state
+    switch (state.uiState) {
+      case UIState.MAIN_CONTENT:
+        // Check if this is from skipping intro or natural completion
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('intro') === 'false') {
+          heroBanner.classList.add('animations-skipped');
           firstMenuItem?.focus();
-          focusTimeout = null;
-        }, 8300);
+        } else {
+          heroBanner.classList.add('animations-started');
+          // Focus after animations complete (8.3s total)
+          focusTimeout = setTimeout(() => {
+            firstMenuItem?.focus();
+            focusTimeout = null;
+          }, 8300);
+        }
         break;
       
-      case AnimationPhase.INTRO_PLAYING:
-      case AnimationPhase.INITIAL:
-        // Keep elements hidden until intro completes or is skipped
+      case UIState.BOOT_SEQUENCE:
+        // Keep elements hidden until boot sequence completes
         break;
     }
   }
@@ -279,67 +279,54 @@ import SocialLinks from './SocialLinks.astro';
   function setupStoreSubscription() {
     // Clean up existing subscription
     if (unsubscribe) {
-      console.log('HeroBanner: Cleaning up existing subscription');
       unsubscribe();
       unsubscribe = null;
     }
 
     // Subscribe to store changes
-    unsubscribe = $animationStore.subscribe((state) => {
+    unsubscribe = $appStore.subscribe((state) => {
       updateHeroBanner(state);
     });
-    console.log('HeroBanner: Store subscription established');
   }
 
   function initialize() {
     if (isInitialized) {
-      console.log('HeroBanner: Already initialized, skipping');
       return;
     }
 
-    console.log('HeroBanner: Initializing');
     initializeElements();
     setupStoreSubscription();
     
     // Initialize store state based on current URL
-    animationActions.initializeFromURL();
+    appActions.initializeFromURL();
     
     // Update UI immediately with current state
-    updateHeroBanner($animationStore.get());
+    updateHeroBanner($appStore.get());
     
     isInitialized = true;
   }
 
-  // Listen for intro completion event from Intro component
-  function handleIntroFinished() {
-    console.log('HeroBanner: Intro finished event received');
-    animationActions.startAnimations();
-  }
-
   // Handle view transition events
   function handleViewTransition() {
-    console.log('HeroBanner: View transition detected');
     // Re-initialize elements after DOM swap but don't re-setup subscription
     initializeElements();
     
     // Reset tracking variable to allow updates for new page context
-    lastAppliedPhase = null;
+    lastAppliedState = null;
     
     // Handle navigation in store
-    animationActions.handleNavigation();
+    appActions.handleNavigation();
   }
 
   // Initialize on load
   initialize();
 
   // Set up event listeners
-  document.addEventListener('introFinished', handleIntroFinished);
   document.addEventListener('astro:page-load', handleViewTransition);
   document.addEventListener('astro:after-swap', handleViewTransition);
 
   // Clean up on page unload
   window.addEventListener('beforeunload', () => {
-    console.log('HeroBanner: Cleaning up on unload');
     if (unsubscribe) {
       unsubscribe();
     }

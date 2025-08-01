@@ -4,7 +4,7 @@
   --color-primary: #2AE7A8;
   --color-foreground: var(--color-green-600);
   --color-muted-foreground: var(--color-green-800);
-  --color-loud-foreground: var(--color-green-500);
+  --color-loud-foreground: var(--color-green-400);
   --color-background: #111111;
 
   --font-console: "Press Start 2P", monospace;
@@ -218,15 +218,8 @@ html {
     letter-spacing: 0.05em;
   }
 
-  & p {
-    color: var(--color-muted-foreground);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-  }
-
   & ul {
-    color: var(--color-muted-foreground);
-    margin-bottom: 1rem;
+    margin-block: 1rem;
     padding-left: 1.5rem;
   }
 

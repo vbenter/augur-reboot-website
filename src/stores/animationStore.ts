@@ -1,61 +1,50 @@
-import { persistentMap } from '@nanostores/persistent';
-import { computed } from 'nanostores';
+import { atom } from 'nanostores';
 
-// Animation phase enumeration for type safety
-export enum AnimationPhase {
-  INITIAL = 'initial',
-  INTRO_PLAYING = 'intro-playing', 
-  INTRO_SKIPPED = 'intro-skipped',
-  ANIMATIONS_ACTIVE = 'animations-active',
-  NAVIGATING = 'navigating'
+// Simple UI state - what should the user see right now?
+export enum UIState {
+  BOOT_SEQUENCE = 'boot-sequence',  // Terminal intro visible
+  MAIN_CONTENT = 'main-content'     // Hero banner visible
 }
 
-// Core animation state interface
-export interface AnimationState {
-  phase: AnimationPhase;
-  gridAnimationStarted: boolean;
-  introCompleted: boolean;
-  isNavigating: boolean;
-  hasSkippedIntro: boolean;
-  frameCount: number;
-  animationFrameId: number | null;
+// Core state interface
+export interface AppState {
+  uiState: UIState;
 }
 
-// Initial state values
-const initialState: AnimationState = {
-  phase: AnimationPhase.INITIAL,
-  gridAnimationStarted: false,
-  introCompleted: false,
-  isNavigating: false,
-  hasSkippedIntro: false,
-  frameCount: 0,
-  animationFrameId: null,
+// Initialize state based on URL parameters and current page
+const getInitialState = (): AppState => {
+  let initialUIState = UIState.BOOT_SEQUENCE;
+  
+  if (typeof window !== 'undefined') {
+    const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
+    const hasSkipParam = new URLSearchParams(window.location.search).get('intro') === 'false';
+    
+    // Non-homepage pages should always show main content
+    if (!isHomepage) {
+      initialUIState = UIState.MAIN_CONTENT;
+    }
+    // Homepage with skip parameter
+    else if (hasSkipParam) {
+      initialUIState = UIState.MAIN_CONTENT;
+    }
+    // Fresh homepage visit - show intro
+    else {
+      initialUIState = UIState.BOOT_SEQUENCE;
+    }
+  }
+  
+  return {
+    uiState: initialUIState,
+  };
 };
 
-// Persistent store that survives page navigation and browser refresh
-export const $animationStore = persistentMap<AnimationState>(
-  'augur-animation-state:', 
-  initialState,
-  {
-    encode: JSON.stringify,
-    decode: JSON.parse,
-  }
-);
+// Non-persistent store - always fresh based on URL
+export const $appStore = atom<AppState>(getInitialState());
 
-// Computed values for convenient access
-export const $currentPhase = computed($animationStore, (state) => state.phase);
-export const $isGridAnimating = computed($animationStore, (state) => state.gridAnimationStarted);
-export const $shouldShowIntro = computed($animationStore, (state) => 
-  state.phase === AnimationPhase.INITIAL || state.phase === AnimationPhase.INTRO_PLAYING
-);
-export const $shouldSkipAnimations = computed($animationStore, (state) => 
-  state.phase === AnimationPhase.INTRO_SKIPPED || state.hasSkippedIntro
-);
+// Helper to get current state snapshot
+export const getAppState = (): AppState => $appStore.get();
 
-// Helper function to get current state snapshot
-export const getAnimationState = (): AnimationState => $animationStore.get();
-
-// Helper function to check if animations should be skipped based on URL
+// Helper to check if intro should be skipped based on URL
 export const shouldSkipFromURL = (): boolean => {
   if (typeof window === 'undefined') return false;
   const params = new URLSearchParams(window.location.search);
@@ -63,65 +52,34 @@ export const shouldSkipFromURL = (): boolean => {
 };
 
 // Action functions for state management
-export const animationActions = {
-  // Initialize state based on URL parameters and current conditions
+export const appActions = {
+  // Reinitialize state based on current URL (for navigation)
   initializeFromURL(): void {
-    const currentState = getAnimationState();
-    const shouldSkip = shouldSkipFromURL();
+    const newState = getInitialState();
+    $appStore.set(newState);
+  },
+
+  // Transition from boot sequence to main content
+  completeBootSequence(): void {
+    $appStore.set({
+      uiState: UIState.MAIN_CONTENT
+    });
+  },
+
+  // Skip boot sequence and go straight to main content (adds URL parameter for manual skip)
+  skipToMainContent(): void {
+    const params = new URLSearchParams(window.location.search);
+    params.set('intro', 'false');
+    window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
     
-    if (shouldSkip) {
-      $animationStore.setKey('phase', AnimationPhase.INTRO_SKIPPED);
-      $animationStore.setKey('hasSkippedIntro', true);
-      $animationStore.setKey('introCompleted', true);
-      $animationStore.setKey('gridAnimationStarted', true);
-    } else {
-      // For clean homepage visits (no ?intro=false), always show intro
-      // Reset to initial state regardless of persistent storage
-      $animationStore.setKey('phase', AnimationPhase.INTRO_PLAYING);
-      $animationStore.setKey('hasSkippedIntro', false);
-      $animationStore.setKey('introCompleted', false);
-      $animationStore.setKey('gridAnimationStarted', false);
-    }
+    $appStore.set({
+      uiState: UIState.MAIN_CONTENT
+    });
   },
 
-  // Transition from intro completion to animations
-  startAnimations(): void {
-    $animationStore.setKey('phase', AnimationPhase.ANIMATIONS_ACTIVE);
-    $animationStore.setKey('introCompleted', true);
-    $animationStore.setKey('gridAnimationStarted', true);
-  },
-
-  // Skip directly to final animation state
-  skipAnimations(): void {
-    $animationStore.setKey('phase', AnimationPhase.INTRO_SKIPPED);
-    $animationStore.setKey('hasSkippedIntro', true);
-    $animationStore.setKey('introCompleted', true);
-    $animationStore.setKey('gridAnimationStarted', true);
-  },
-
-  // Handle view transition events
+  // Handle navigation events - preserve current state
   handleNavigation(): void {
-    const wasNavigating = getAnimationState().isNavigating;
-    $animationStore.setKey('isNavigating', false);
-    
     // Re-evaluate state based on current URL after navigation
     this.initializeFromURL();
-  },
-
-  // Mark navigation start
-  startNavigation(): void {
-    $animationStore.setKey('isNavigating', true);
-    $animationStore.setKey('phase', AnimationPhase.NAVIGATING);
-  },
-
-  // Update grid animation frame data
-  updateGridFrame(frameCount: number, animationFrameId: number | null): void {
-    $animationStore.setKey('frameCount', frameCount);
-    $animationStore.setKey('animationFrameId', animationFrameId);
-  },
-
-  // Reset to initial state (for development/testing)
-  reset(): void {
-    $animationStore.set(initialState);
   }
 };

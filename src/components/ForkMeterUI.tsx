@@ -216,7 +216,7 @@ const ForkMeterUI: React.FC<ForkMeterProps> = ({
       </div>
 
       {/* State-Based Content Rendering */}
-      <p className="text-muted-foreground text-center break-words mb-1 uppercase tracking-wider">
+      <p className="text-loud-foreground font-bold text-center break-words mb-1 uppercase tracking-wider">
         {currentStateConfig.primaryText}
       </p>
       
@@ -231,7 +231,7 @@ const ForkMeterUI: React.FC<ForkMeterProps> = ({
       
       {currentStateConfig.secondaryContent === 'custom' && (
         <div className="text-center mb-2">
-          <div className="text-sm text-muted-foreground uppercase tracking-wider">
+          <div className="text-sm text-loud-foreground uppercase tracking-wider">
             {customStateContent[currentState] || currentStateConfig.customContent || 'CUSTOM STATE ACTIVE'}
           </div>
         </div>
