@@ -11,7 +11,7 @@ const bootSentences: string[] = [
   "", // Start with a blank line for the "warm-up"
   "AUGUR BOOT SEQUENCE INITIATED",
   "PERFORMING SYSTEM CHECKS... UPDATE REQUIRED",
-  "AUGUR REBOOT INITIATED"
+  "AUGUR REBOOT BEGIN"
 ];
 
 const Intro: React.FC = () => {

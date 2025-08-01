@@ -9,25 +9,32 @@ export enum UIState {
 // Core state interface
 export interface AppState {
   uiState: UIState;
-  gridFrameCount: number;
-  gridAnimationFrameId: number | null;
 }
 
-// Initialize state based on URL parameters
+// Initialize state based on URL parameters and current page
 const getInitialState = (): AppState => {
   let initialUIState = UIState.BOOT_SEQUENCE;
   
   if (typeof window !== 'undefined') {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('intro') === 'false') {
+    const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
+    const hasSkipParam = new URLSearchParams(window.location.search).get('intro') === 'false';
+    
+    // Non-homepage pages should always show main content
+    if (!isHomepage) {
       initialUIState = UIState.MAIN_CONTENT;
+    }
+    // Homepage with skip parameter
+    else if (hasSkipParam) {
+      initialUIState = UIState.MAIN_CONTENT;
+    }
+    // Fresh homepage visit - show intro
+    else {
+      initialUIState = UIState.BOOT_SEQUENCE;
     }
   }
   
   return {
     uiState: initialUIState,
-    gridFrameCount: 0,
-    gridAnimationFrameId: null,
   };
 };
 
@@ -55,29 +62,18 @@ export const appActions = {
   // Transition from boot sequence to main content
   completeBootSequence(): void {
     $appStore.set({
-      ...$appStore.get(),
       uiState: UIState.MAIN_CONTENT
     });
   },
 
-  // Skip boot sequence and go straight to main content
+  // Skip boot sequence and go straight to main content (adds URL parameter for manual skip)
   skipToMainContent(): void {
     const params = new URLSearchParams(window.location.search);
     params.set('intro', 'false');
     window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
     
     $appStore.set({
-      ...$appStore.get(),
       uiState: UIState.MAIN_CONTENT
-    });
-  },
-
-  // Update grid animation frame data
-  updateGridFrame(frameCount: number, animationFrameId: number | null): void {
-    $appStore.set({
-      ...$appStore.get(),
-      gridFrameCount: frameCount,
-      gridAnimationFrameId: animationFrameId
     });
   },
 

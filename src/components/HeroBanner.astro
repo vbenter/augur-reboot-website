@@ -241,7 +241,6 @@ import SocialLinks from './SocialLinks.astro';
       return;
     }
 
-    console.log('HeroBanner: Updating from', lastAppliedState, 'to', state.uiState);
     lastAppliedState = state.uiState;
 
     // Clear any pending focus timeout
@@ -280,7 +279,6 @@ import SocialLinks from './SocialLinks.astro';
   function setupStoreSubscription() {
     // Clean up existing subscription
     if (unsubscribe) {
-      console.log('HeroBanner: Cleaning up existing subscription');
       unsubscribe();
       unsubscribe = null;
     }
@@ -289,16 +287,13 @@ import SocialLinks from './SocialLinks.astro';
     unsubscribe = $appStore.subscribe((state) => {
       updateHeroBanner(state);
     });
-    console.log('HeroBanner: Store subscription established');
   }
 
   function initialize() {
     if (isInitialized) {
-      console.log('HeroBanner: Already initialized, skipping');
       return;
     }
 
-    console.log('HeroBanner: Initializing');
     initializeElements();
     setupStoreSubscription();
     
@@ -313,7 +308,6 @@ import SocialLinks from './SocialLinks.astro';
 
   // Handle view transition events
   function handleViewTransition() {
-    console.log('HeroBanner: View transition detected');
     // Re-initialize elements after DOM swap but don't re-setup subscription
     initializeElements();
     
@@ -333,7 +327,6 @@ import SocialLinks from './SocialLinks.astro';
 
   // Clean up on page unload
   window.addEventListener('beforeunload', () => {
-    console.log('HeroBanner: Cleaning up on unload');
     if (unsubscribe) {
       unsubscribe();
     }
