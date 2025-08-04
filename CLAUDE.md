@@ -30,6 +30,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **MUST** call dispose() in React component cleanup effects to prevent GPU memory leaks
 **NEVER** render after disposal - add isDisposed guards in render methods
 
+## Code Standards & Quality
+**MUST** follow established patterns in @docs/CODING_STANDARDS.md
+
 # CURRENT PROJECT STATE
 
 ## Active Configuration
