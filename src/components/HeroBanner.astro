@@ -2,6 +2,7 @@
 import AugurLogo from '../assets/augur.svg';
 import ForkMeter from './ForkMeter.tsx';
 import SocialLinks from './SocialLinks.astro';
+import { withBase } from '../lib/utils';
 ---
 
 <div class="fixed inset-0 h-screen w-screen overflow-scroll">
@@ -32,10 +33,10 @@ import SocialLinks from './SocialLinks.astro';
       </h2>
 
       <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
-        <a id="first-menu-item" href="/mission" class="text-2xl font-bold text-foreground py-1 block hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none">
+        <a id="first-menu-item" href={withBase('/mission')} class="text-2xl font-bold text-foreground py-1 block hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none">
           THE NEXT GENERATION OF ORACLES
         </a>
-        <a href="/team" class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground py-1 block hover:fx-glow focus:fx-glow focus:outline-none ">
+        <a href={withBase('/team')} class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground py-1 block hover:fx-glow focus:fx-glow focus:outline-none ">
           THE MINDS BEHIND THE REBOOT
         </a>
       </div>

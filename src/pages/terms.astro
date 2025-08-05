@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import Button from "../components/Button.tsx";
 import Pointer from "../components/Pointer.tsx";
 import PageHeading from "../components/PageHeading.astro";
+import { withBase } from "../lib/utils";
 ---
 
 <Layout title="Terms of Service - Augur">
@@ -12,7 +13,7 @@ import PageHeading from "../components/PageHeading.astro";
     <!-- Top Section: Navigation -->
     <div class="flex justify-between items-start p-8">
       <!-- Back Button -->
-      <Button id="back-button" variant="link" href="/?intro=false" autofocus>
+      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autofocus>
         <Pointer direction="left" animated="auto" />
         BACK TO HOME
       </Button>

@@ -9,6 +9,7 @@ import PageHeading from "../components/PageHeading.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import LituusLogo from "../assets/lituus.svg";
 import DarkFloristLogo from "../assets/darkflorist.svg";
+import { withBase } from "../lib/utils";
 ---
 
 <Layout title="Team - Augur">
@@ -16,7 +17,7 @@ import DarkFloristLogo from "../assets/darkflorist.svg";
     <!-- Top Section: Navigation -->
     <div class="flex justify-between items-start p-8">
       <!-- Back Button -->
-      <Button id="back-button" variant="link" size="lg" href="/?intro=false" autofocus>
+      <Button id="back-button" variant="link" size="lg" href={withBase('/?intro=false')} autofocus>
         <Pointer animated="auto" direction="left" />
         BACK TO HOME
       </Button>
