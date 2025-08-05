@@ -36,15 +36,10 @@ jobs:
 
       - name: Sync source files from main
         run: |
-          # Get latest main content
+          # Get latest main content - only files needed for build
           git checkout main -- src/
           git checkout main -- public/
-          git checkout main -- README.md
-          git checkout main -- CLAUDE.md
-          git checkout main -- docs/
           git checkout main -- tsconfig.json
-          git checkout main -- worker-configuration.d.ts
-          git checkout main -- wrangler.jsonc
           git checkout main -- astro.config.mjs
           git checkout main -- package.json
           git checkout main -- package-lock.json
