@@ -45,15 +45,32 @@ jobs:
           git checkout main -- tsconfig.json
           git checkout main -- worker-configuration.d.ts
           git checkout main -- wrangler.jsonc
-          
-          # Restore gh-pages specific files
-          git checkout gh-pages -- astro.config.mjs
-          git checkout gh-pages -- .github/workflows/deploy.yml
-          git checkout gh-pages -- public/.nojekyll
-          
-          # Handle package.json - sync dependencies but preserve any gh-pages specific scripts
+          git checkout main -- astro.config.mjs
           git checkout main -- package.json
           git checkout main -- package-lock.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies and build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy built files to gh-pages
+        run: |
+          # Clear everything except .git and dist
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'dist' -exec rm -rf {} +
+          
+          # Move built files to root
+          mv dist/* .
+          rm -rf dist
+          
+          # Add .nojekyll to prevent Jekyll processing
+          touch .nojekyll
 
       - name: Check for changes
         id: changes
