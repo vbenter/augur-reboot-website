@@ -44,9 +44,16 @@ All commands are run from the root of the project in a terminal:
 
 ## ☁️ Deployment
 
-This project is configured for continuous deployment to [Cloudflare Pages](https://pages.cloudflare.com/). A new version can be deployed by running the appropriate deployment command.
+This project supports dual deployment to both [Cloudflare Pages](https://pages.cloudflare.com/) and [GitHub Pages](https://pages.github.com/):
 
-To deploy manually, run:
+- **Main branch**: Deploys to Cloudflare Pages automatically
+- **GitHub Pages branch**: Syncs automatically from main and deploys to GitHub Pages
+
+### Manual Deployment
+To deploy manually to Cloudflare Pages, run:
 ```sh
 npm run deploy
 ```
+
+### Automatic Syncing
+Changes to the main branch are automatically synced to the `gh-pages` branch via GitHub Actions, maintaining both deployment targets without manual intervention.
