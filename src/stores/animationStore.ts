@@ -16,7 +16,13 @@ const getInitialState = (): AppState => {
   let initialUIState = UIState.BOOT_SEQUENCE;
   
   if (typeof window !== 'undefined') {
-    const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
+    // Get the base path from environment (accounts for both Cloudflare and GitHub Pages)
+    const basePath = import.meta.env.BASE_URL || '/';
+    // Normalize base path to ensure consistent comparison
+    const normalizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
+    const normalizedPathname = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+    
+    const isHomepage = normalizedPathname === normalizedBasePath;
     const hasSkipParam = new URLSearchParams(window.location.search).get('intro') === 'false';
     
     // Non-homepage pages should always show main content
