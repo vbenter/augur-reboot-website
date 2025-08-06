@@ -23,7 +23,8 @@ const baseConfig = {
 
 // GitHub Pages specific configuration
 const gitHubPagesConfig = {
-  base: repoName ? `/${repoName}` : undefined,
+  site: 'https://augur.net',
+  // No base path needed for custom domain - apex domain serves from root
   output: /** @type {'static'} */ ('static')
 };
 

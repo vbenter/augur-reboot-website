@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Utility function to construct URLs with the correct base path
- * Works with both Cloudflare (no base) and GitHub Pages (with base path)
+ * Works with Cloudflare (no base), GitHub Pages (with base path), and custom domain (no base)
  */
 export function withBase(path: string): string {
   let base = import.meta.env.BASE_URL || '/';

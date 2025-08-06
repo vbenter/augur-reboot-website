@@ -16,9 +16,12 @@ const getInitialState = (): AppState => {
   let initialUIState = UIState.BOOT_SEQUENCE;
   
   if (typeof window !== 'undefined') {
-    // Get the base path from environment (accounts for both Cloudflare and GitHub Pages)
+    // Get the base path from environment (accounts for Cloudflare, GitHub Pages, and custom domain)
     const basePath = import.meta.env.BASE_URL || '/';
-    // Normalize base path to ensure consistent comparison
+    
+    // For custom domain (augur.net), base path will be '/' and pathname will be '/'
+    // For GitHub Pages without custom domain, base path will be '/augur-reboot-website/' 
+    // For Cloudflare testing, base path will be '/'
     const normalizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
     const normalizedPathname = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
     
