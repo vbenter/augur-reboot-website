@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 
 interface PointerProps {
   animated?: 'auto' | 'always';
-  direction?: 'left' | 'right';
+  direction?: 'left' | 'right' | 'down';
   className?: string;
 }
 

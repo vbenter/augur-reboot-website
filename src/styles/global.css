@@ -129,6 +129,15 @@ html {
   }
 }
 
+@keyframes bounce-vertical {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
 @keyframes pulse-glow {
   0%, 67% {
     filter: drop-shadow(0 0 var(--glow-size-sm) var(--color-primary));
@@ -228,6 +237,7 @@ html {
 
   &.pointer-left::before { content: '<'; }
   &.pointer-right::before { content: '>'; }
+  &.pointer-down::before { content: '∨'; }
 
   /* Auto pointers: animate on focus, stop on hover */
   &.pointer-animated {
@@ -241,6 +251,19 @@ html {
   /* Always animate */
   &.pointer-animate-always { 
     animation: bounce-horizontal 1s ease-in-out infinite; 
+  }
+
+  /* Down pointer uses vertical bounce */
+  &.pointer-down.pointer-animate-always {
+    animation: bounce-vertical 1s ease-in-out infinite;
+  }
+
+  &.pointer-down.pointer-animated {
+    animation: bounce-vertical 1s ease-in-out infinite;
+
+    :hover > & {
+      animation: none;
+    }
   }
 }
 
