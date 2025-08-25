@@ -1,0 +1,71 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import Footer from "../components/Footer.astro";
+import Button from "../components/Button.tsx";
+import Pointer from "../components/Pointer.tsx";
+import { withBase } from "../lib/utils";
+---
+
+<Layout title="404: Page Not Found - Augur">
+  <div class="flex flex-col">
+    <!-- Main content wrapper that fills viewport -->
+    <div class="min-h-screen flex flex-col">
+      <!-- Top Section: Navigation -->
+      <div class="flex justify-between items-start p-4 md:p-8">
+        <!-- Home Button -->
+        <Button
+          id="home-button"
+          variant="link"
+          size="lg"
+          href={withBase("/?intro=false")}
+        >
+          <Pointer animated="auto" direction="left" />
+          BACK TO HOME
+        </Button>
+
+        <!-- Social Links -->
+        <SocialLinks />
+      </div>
+
+      <!-- Middle Section: 404 Content -->
+      <main class="flex-1 flex items-center justify-center px-4 md:px-8">
+        <div class="text-center max-w-2xl mx-auto flex flex-col items-center">
+          <h1 class="uppercase mb-4 text-2xl font-bold tracking-widest">Page Not Found</h1>
+          <!-- ASCII Art 404 -->
+          <pre class="title leading-none tracking-tight text-[size:clamp(0.8rem,_1vw,_0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" aria-label="404 - Page Not Found">
+██╗  ██╗ ██████╗ ██╗  ██╗
+██║  ██║██╔═████╗██║  ██║
+███████║██║██╔██║███████║
+╚════██║████╔╝██║╚════██║
+     ██║╚██████╔╝     ██║
+     ╚═╝ ╚═════╝      ╚═╝
+          </pre>
+
+          <!-- Error Message -->
+          <div class="border border-foreground/20 bg-background/70 px-6 py-4 mx-auto max-w-sm my-6">
+            <p class="uppercase text-muted-foreground leading-6">
+              The oracle has spoken: <span class="text-loud-foreground">This page does not exist in our reality</span>. Perhaps it's in an alternate timeline, or maybe the prediction market for its existence resolved to FALSE.
+            </p>
+          </div>
+
+          <!-- Navigation Message -->
+          <div class="text-center space-y-4">
+            <p class="text-sm uppercase text-muted-foreground font-console-narrow opacity-80">
+              Return to the homepage by <a href={withBase("/?intro=false")} class="text-loud-foreground hover:fx-glow-sm transition-all">clicking here</a> <br />
+              or scroll further down to explore community links.
+            </p>
+
+            <!-- Animated Down Arrow -->
+            <div class="flex justify-center">
+              <Pointer animated="always" direction="down" />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Footer outside the viewport -->
+    <Footer />
+  </div>
+</Layout>
